@@ -1,2 +1,67 @@
+## Ignore these huge files in this repository
+*.root
+/fields/
+/bk/
+/logs/
+/backups/
+/old/
+/results/
+!results/db
+/rootfiles
+/tst.tst
+/tst_batch/
+map_696A.dat
+/jlab_batch/
+/scripts/
+/cmu_batch/
+
+
+##
 *.root
 *.pcm
+*.so
+*.d
+ooo*.*
+.*.swo
+.*.swp
+
+
+
+### FROM https://gist.github.com/octocat/9257657
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+#*.log
+#*.sql
+#*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
