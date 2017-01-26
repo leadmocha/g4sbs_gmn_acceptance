@@ -7,6 +7,12 @@
 {% macro printIfNotError(val,type='') -%}{% if val != stdErrVal  %}{{ms.printV(val,type)}}{% endif %}{%- endmacro %}
 {% macro printValAndPDiff(r,val,row,useclass='',valType='') -%}
 <td class="{{useclass}} double_valued_cell" style="white-space: nowrap;"><pre>{{ms.printV(r['values'][val],valType)}}{% if row > 1 %} (<span class="{{ r['values']['class_%s'%val]}}">{{ms.printV(r['values']['pdiff_%s'%val],'pdiff')}}</span>){% else %}          {% endif %}</pre></td>{% endmacro %}
+{% macro printRatioInfo(r,val='') -%}
+<td><pre>{{ms.printV(r[val+'posID'],'gmn_ratio')}}</pre></td>
+<td><pre>{{ms.printV(r[val+'measured'],'gmn_ratio')}}</pre></td>
+<td class='sepcol'><pre>{{ms.printV(r['pdiff_'+val+'overestimate'],'pdiff')}}</pre></td>
+{% endmacro %}
+
 
 {% block body scoped %}
 <table class="hcal_set_table">
@@ -85,15 +91,27 @@
 
     <td class='sepcol row_title' colspan='6'>{{ms.rowTitle('negID',1)}}</td>
     <td class='sepcol row_title' colspan='4'>{{ms.rowTitle('posID',1)}}</td>
-    <td class='sepcol row_title' rowspan='3'>{{ms.rowTitle('pdiff_ratio_overestimate',1)}}</td>
+    <td class='sepcol row_title' colspan='3'>Ratios &sigma;<sub>n</sub>/&sigma;<sub>p</sub> with No Efficiency</td>
+    <!--
+    <td class='sepcol row_title' colspan='3'>Ratios &sigma;<sub>n</sub>/&sigma;<sub>p</sub> with Efficiency</td>
+    -->
+    <td class='sepcol row_title' rowspan='3'>Estimated Statistical Error</td>
   </tr>
   <tr class="row_title2">
     <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
-    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerTotal',1)}}</td>
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerOtherPosID',1)}}</td>
     <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerFirst',1)}}</td>
 
     <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
     <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerFirst',1)}}</td>
+    <td class='row_title' rowspan='2'>{{ms.rowTitle('ratio_posID',1)}}</td>
+    <td class='row_title' rowspan='2'>{{ms.rowTitle('ratio_measured',1)}}</td>
+    <td class='sepcol row_title' rowspan='2'>{{ms.rowTitle('pdiff_ratio_overestimate',1)}}</td>
+    <!--
+    <td class='row_title' rowspan='2'>{{ms.rowTitle('ratio_eff_posID',1)}}</td>
+    <td class='row_title' rowspan='2'>{{ms.rowTitle('ratio_eff_measured',1)}}</td>
+    <td class='sepcol row_title' rowspan='2'>{{ms.rowTitle('pdiff_ratio_eff_overestimate',1)}}</td>
+    -->
   </tr>
   <tr class="row_subtitle">
     <td>Proton</td><td class='sepcol'>Neutron</td>
@@ -114,8 +132,12 @@
 
     <td><pre>{{ms.printV(ex.negPSigmaID,'sigmaID')}}</pre></td>
     <td class='sepcol'><pre>{{ms.printV(ex.negNSigmaID,'sigmaID')}}</pre></td>
+      <!--
     <td><pre class="{{ex.class_negPSigmaIDPerTotal}}">{{ms.printV(ex.negPSigmaIDPerTotal,'percent')}}</pre></td>
     <td class='sepcol'><pre class="{{ ex.class_negPSigmaIDPerTotal }}">{{ms.printV(ex.negNSigmaIDPerTotal,'percent')}}</pre></td>
+      -->
+    <td><pre class="{{ex.class_negPSigmaIDPerOtherPosID}}">{{ms.printV(ex.negPSigmaIDPerOtherPosID,'percent')}}</pre></td>
+    <td class='sepcol'><pre class="{{ ex.class_negPSigmaIDPerOtherPosID }}">{{ms.printV(ex.negNSigmaIDPerOtherPosID,'percent')}}</pre></td>
     <td><pre class='{{ex.class_negPSigmaIDPerFirst}}'>{{printIfNotError(ex.negPSigmaIDPerFirst,'pdiffn')}}</pre></td>
     <td class='sepcol'><pre class='{{ex.class_negNSigmaIDPerFirst}}'>{{printIfNotError(ex.negNSigmaIDPerFirst,'pdiffn')}}</pre></td>
 
@@ -123,7 +145,9 @@
     <td class='sepcol'><pre>{{ms.printV(ex.posNSigmaID,'sigmaID')}}</pre></td>
     <td><pre class='{{ex.class_posPSigmaIDPerFirst}}'>{{printIfNotError(ex.posPSigmaIDPerFirst,'pdiffn')}}</pre></td>
     <td class='sepcol'><pre class='{{ex.class_posNSigmaIDPerFirst}}'>{{printIfNotError(ex.posNSigmaIDPerFirst,'pdiffn')}}</pre></td>
-    <td class='sepcol'><pre>{{ms.printV(ex.pdiff_ratio_overestimate,'pdiff')}}</pre></td>
+    {{printRatioInfo(ex,'ratio_')}}
+    <!-- {{printRatioInfo(ex,'ratio_eff_')}} -->
+    <td class="sepcol"><pre>{{ms.printV(ex.stat_error,'percent')}}</pre></td>
   </tr>
   {% endfor %}
   {% endfor %}

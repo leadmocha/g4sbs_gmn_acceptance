@@ -15,6 +15,8 @@ PerTotal_EffectThr = 0.99
 
 import math;
 
+from GMnKinCalculator import *
+
 from GMnDB import *
 db = GMnDB()
 
@@ -38,8 +40,54 @@ currentConfig = None
 
 ## Estimate the efficiencies for a given particle (0=neutron, 1=proton)
 ## and given Q2.
-def getEfficiency(Q2,particle):
-    return 1.0
+def getEfficiency(momentum,particle):
+  ## These are just "estimates" by eye based on the updated proposal
+  if particle == 1:
+    if momentum < 5:
+      return 0.99;
+    if momentum < 5.5:
+      return 0.985;
+    if momentum < 6.5:
+      return 0.98;
+    if momentum < 7.5:
+      return 0.975;
+    if momentum < 8.5:
+      return 0.97;
+    if momentum < 9.5:
+      return 0.965;
+    if momentum < 11:
+      return 0.96;
+    else:
+      return 0.96;
+  elif particle == 0:
+    if momentum < 3:
+      return 0.9425;
+    else:
+      return 0.95;
+  return 0.0
+
+## Get the proposed luminosities
+def getLuminosity(kin):
+  ## Given in 10x38/cm^2/sec
+  lumis =  (0, 0.7, 1.4, 2.8, 2.9, 1.4, 2.8, 1.5)
+  return lumis[kin]
+def getRunningTime(kin):
+  ## Hours from the updated proposal
+  hours = (0, 12, 12, 18, 18, 24, 48, 96 )
+  return hours[kin]*3600 ## return value is in seconds
+def getIntLuminosity(kin):
+  ## Given in 10x38
+  return getLuminosity(kin)*getRunningTime(kin)
+def computeStats(sigmaN,sigmaP,kin):
+  ## Multiplier that takes into accoun 10x38 from Luminosity and
+  ## 10x-36 from sigma (in pb)
+  mult = 100;
+  intLumi = getLuminosity(kin)*getRunningTime(kin)
+  eventsN = sigmaN*intLumi*mult;
+  eventsP = sigmaP*intLumi*mult;
+  errN = 1.0/math.sqrt(eventsN)
+  errP = 1.0/math.sqrt(eventsP)
+  return 100.*math.sqrt(errN**2+errP**2)
 
 def percentOf(val1,val2):
   return 100.0*(val1/val2)
@@ -89,8 +137,10 @@ class ExResults:
       for iden in ('neg%sSigmaID'%h, 'pos%sSigmaID'%h):
         self['%s'%iden] = 0.0
         self['%sPerTotal'%iden] = stdErrVal
+        self['%sPerOtherPosID'%iden] = stdErrVal
         self['%sPerFirst'%iden] = stdErrVal
         self['class_%sPerTotal'%iden] = ''
+        self['class_%sPerOtherPosID'%iden] = ''
         self['class_%sPerFirst'%iden] = ''
 
   def setParent(self,parent):
@@ -99,20 +149,56 @@ class ExResults:
     self['posPSigmaID']             = parent.posIDSigmaP
     self['negNSigmaID']             = parent.negIDSigmaN
     self['posNSigmaID']             = parent.posIDSigmaN
+    ## Compute the same but take into account the hadron detection efficiency
+    neff = getEfficiency(currentConfig['scat_h_p'],0)
+    peff = getEfficiency(currentConfig['scat_h_p'],1)
+    self['negPSigmaIDEff']          = parent.negIDSigmaP*peff
+    self['posPSigmaIDEff']          = parent.posIDSigmaP*peff
+    self['negNSigmaIDEff']          = parent.negIDSigmaN*neff
+    self['posNSigmaIDEff']          = parent.posIDSigmaN*neff
     self.computeRatios()
+    ## Estimate the statistical error on these
+    self['stat_error'] = computeStats(self['posNSigmaID'],
+        self['posPSigmaID'],currentConfig['kin'])
+    ## Compute the various percentage hadron cross sections
+    self.__computePer('OtherPosID','negP','posN')
+    self.__computePer('OtherPosID','negN','posP')
+
+  def __computeRatios(self,witheff=0):
+    pref = 'ratio_'
+    post = ''
+    if witheff == 1:
+      pref = 'ratio_eff_'
+      post = 'Eff'
+    ## Compute the measured ratio and the ratio due to just positive
+    self[pref+'posID'] = self['posNSigmaID'+post]/self['posPSigmaID'+post]
+    self[pref+'negID'] = self['negNSigmaID'+post]/self['negPSigmaID'+post]
+    top    = self['posNSigmaID'+post] + self['negPSigmaID'+post]
+    bottom = self['posPSigmaID'+post] + self['negNSigmaID'+post]
+    self[pref+'measured'] = top/bottom
+    self[pref+'overestimate'] = self[pref+'measured']/self[pref+'posID']
+    self['pdiff_'+pref+'overestimate'] = (self[pref+'overestimate']-1.0)*100.
 
   def computeRatios(self):
     ## Compute the measured ratio and the ratio due to just positive
     ## identification
-    self['ratio_posID'] = self['posNSigmaID']/self['posPSigmaID']
-    self['ratio_negID'] = self['negNSigmaID']/self['negPSigmaID']
-    neff = getEfficiency(currentConfig['Q2'],0)
-    peff = getEfficiency(currentConfig['Q2'],1)
-    top    = neff*self['posNSigmaID'] + peff*self['negPSigmaID']
-    bottom = peff*self['posPSigmaID'] + neff*self['negNSigmaID']
-    self['ratio_measured'] = top/bottom
-    self['ratio_overestimate'] = self['ratio_measured']/self['ratio_posID']
-    self['pdiff_ratio_overestimate'] = (self['ratio_overestimate']-1.0)*100.
+    ## Without hadron detection efficiency factor
+    self.__computeRatios(0)
+    ## With hadron detection efficiency factor
+    self.__computeRatios(1)
+
+  def __computePer(self,per,var1,var2,sign=0):
+    val = 100.0*self[var1+'SigmaID']/self[var2+'SigmaID']
+    self[var1+'SigmaIDPer'+per] = val
+    effect = ''
+    #if sign == 0:
+    #  return
+    #val = sign*self[var1+'SigmaIDPer'+per]
+    #if val < -PerTotal_EffectThr:
+    #  effect = 'effect_bad'
+    #elif val > PerTotal_EffectThr:
+    #  effect = 'effect_good'
+    #self['class_'+var+'SigmaIDPer'+per] = effect
 
 
   def __computePerTotal(self,var,parentVal,sign=0):
@@ -210,6 +296,11 @@ class ConfigSet:
     self.vals['golden'] = golden
     if golden:
       self.vals['golden_class'] = 'golden_kin'
+    ## Calculate some of the outgoing energies
+    GMnComputeKinematics(self)
+
+  def __setitem__(self,key,val):
+    self.vals[key] = val
 
   def __getitem__(self,key):
     return self.vals[key]
