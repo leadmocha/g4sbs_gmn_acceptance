@@ -1,0 +1,28 @@
+<Request>
+  <Email email="cornejo@jlab.org" request="false" job="false" />
+  <Project name="sbs" />
+  <Track name="analysis" />
+  <Name name="gmn_plot_%%$config%%_k%%$kin%%" />
+  <TimeLimit unit="minutes" time="140" />
+  <DiskSpace space="1" unit="GB" />
+  <Memory space="2" unit="GB" />
+  <OS name="centos7" />
+  <Command><![CDATA[
+    echo "Initializing Environment"
+    echo "Date:     `date`"
+    echo "User:     `whoami`"
+    echo "Hostname: `hostname`"
+    echo "Path:     `pwd`"
+
+    echo "Switching to SBS path"
+    cd /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace
+
+    ./run_date_kin_acceptance.sh %%$config%% %%$kin%% %%$q2%%
+  ]]></Command>
+
+<Job>
+  <!-- Specify storage for StdOut and StdErr -->
+  <Stdout dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$plotBatchLogFilePrefix%%.out" />
+  <Stderr dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$plotBatchLogFilePrefix%%.err" />
+</Job>
+</Request>

@@ -1,0 +1,2 @@
+/gui/addMenu   vis Visualization
+/gui/addButton vis "Init Vis GMN" "/control/execute scripts/vis_jc2_gmn.mac"

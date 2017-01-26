@@ -1,0 +1,71 @@
+<Request>
+  <Email email="cornejo@jlab.org" request="false" job="true" />
+  <Project name="a-sbs" />
+  <Track name="simulation" />
+  <Name name="g4sbs_%%$config%%_k%%$kin%%_r%%$runString%%" />
+  <TimeLimit unit="minutes" time="400" />
+  <DiskSpace space="10" unit="GB" />
+  <Memory space="1024" unit="MB" />
+  <OS name="centos65" />
+  <Command><![CDATA[
+    echo "Initializing Environment"
+    echo "Date:     `date`"
+    echo "User:     `whoami`"
+    echo "Hostname: `hostname`"
+    echo "Path:     `pwd`"
+
+    echo "Files in present directory at start"
+    ls
+
+    echo "Creating local disk structure"
+    mkdir -p %%$macPath%%
+    mkdir -p %%$rootKinPath%%
+    mkdir -p %%$rootGeneratedPath%%
+
+    echo "Copying files from workdisk to local disk"
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$rootGeneratedFileName%% %%$rootGeneratedFileName%%
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/build/g4sbs .
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/build/rootlogon.C .
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/map_696A.dat .
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/scripts/preinit_jc2_gmn.mac scripts/
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$macroFileName%% %%$macroFileName%%
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$runMacroFileName%% %%$runMacroFileName%%
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/shrinkGMn.C .
+    cp /lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/shrinkGMn.h .
+
+    echo "Running G4SBS "
+    time ./g4sbs --pre=scripts/preinit_jc2_gmn.mac --post=%%$runMacroFileName%%
+
+    echo "Condensing ROOT file"
+    root -b -q shrinkGMn.C\(\"%%$rootFileName%%\",\"%%$rootFileNameSmall%%\"\)
+
+  ]]></Command>
+
+<Job>
+  <!-- Copy in g4sbs executable and helper macros -->
+  <!--
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/build/g4sbs" dest="g4sbs" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/build/rootlogon.C" dest="rootlogon.C" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/map_696A.dat" dest="map_696A.dat" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/scripts/preinit_jc2_gmn.mac" dest="scripts/preinit_jc2_gmn.mac" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$macroFileName%%" dest="%%$macroFileName%%" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$runMacroFileName%%" dest="%%$runMacroFileName%%" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/shrinkGMn.C" dest="shrinkGMn.C" />
+  <Input src="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/shrinkGMn.h" dest="shrinkGMn.h" />
+  -->
+
+  <!-- Save the "condensed" root file -->
+  <!--
+  <Output src="%%$rootFileNameSmall%%" dest="/lustre/expphy/volatile/halla/sbs/cornejo/%%$rootFileName%%" />
+    -->
+  <!-- Save the generated root file -->
+  <!--
+  <Output src="%%$rootFileName%%" dest="/lustre/expphy/volatile/halla/sbs/cornejo/%%$rootGeneratedFileName%%" />
+    -->
+  %%$jlabSaveRootFileXMLCmnd%%
+
+  <!-- Specify storage for StdOut and StdErr -->
+  <Stdout dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$jlabBatchLogFilePrefix%%.out" />
+  <Stderr dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$jlabBatchLogFilePrefix%%.err" />
+</Job>
+</Request>

@@ -1,0 +1,10 @@
+## Specify output file name
+/g4sbs/filename %%$rootFileName%%
+
+## Then execute the generic kin%%$kin%% macro
+/control/execute %%$macroFileName%%
+#/g4sbs/filegeneratorfile %%$rootGeneratedFileName%%
+%%$genCmd%%
+
+## Run the actual simulation
+/g4sbs/run %%$numOfEvents%%

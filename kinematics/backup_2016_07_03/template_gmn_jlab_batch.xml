@@ -1,0 +1,58 @@
+<Request>
+  <Email email="cornejo@jlab.org" request="false" job="true" />
+  <Project name="a-sbs" />
+  <Track name="simulation" />
+  <Name name="g4sbs_%%$config%%_k%%$kin%%_r%%$runString%%" />
+  <TimeLimit unit="minutes" time="400" />
+  <DiskSpace space="10" unit="GB" />
+  <Memory space="1024" unit="MB" />
+  <OS name="centos65" />
+  <Variable name="GMNBASEDIR" value="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace" />
+  <Variable name="G4SBSBUILD_DIR" value="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/build" />
+  <Command><![CDATA[
+    echo "Initializing Environment"
+    echo "Date:     `date`"
+    echo "User:     `whoami`"
+    echo "Hostname: `hostname`"
+    echo "Path:     `pwd`"
+
+    echo "Files in present directory at start"
+    ls
+
+    echo "Creating local disk structure"
+    mkdir -p %%$macPath%%
+    mkdir -p %%$rootKinPath%%
+    mkdir -p %%$rootGeneratedKinPath%%
+
+    echo "Initializing environmental variables"
+
+    echo "Copying files from workdisk to local disk"
+    cp ${G4SBSBUILD_DIR}/g4sbs .
+    cp ${G4SBSBUILD_DIR}/rootlogon.C .
+
+    if (%%$copyGenFile%%) cp ${GMNBASEDIR}/%%$rootGeneratedFileName%% %%$rootGeneratedFileName%%
+    cp ${GMNBASEDIR}/map_696A.dat .
+    cp ${GMNBASEDIR}/scripts/preinit_jc2_gmn.mac scripts/
+    cp ${GMNBASEDIR}/%%$macroFileName%% %%$macroFileName%%
+    cp ${GMNBASEDIR}/%%$runMacroFileName%% %%$runMacroFileName%%
+    cp ${GMNBASEDIR}/shrinkGMn.C .
+    cp ${GMNBASEDIR}/shrinkGMn.h .
+    cp ${GMNBASEDIR}/shrinkGenerated.C .
+
+    echo "Running G4SBS "
+    time ./g4sbs --pre=scripts/preinit_jc2_gmn.mac --post=%%$runMacroFileName%%
+
+    echo "Condensing ROOT file"
+    root -b -q %%$shrinkMacro%%\(\"%%$rootFileName%%\",\"%%$rootFileNameSmall%%\"\)
+
+  ]]></Command>
+
+<Job>
+  <!-- Save the "condensed" root file -->
+  <Output src="%%$rootFileNameSmall%%" dest="/lustre/expphy/volatile/halla/sbs/cornejo/%%$rootFileName%%" />
+
+  <!-- Specify storage for StdOut and StdErr -->
+  <Stdout dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$jlabBatchLogFilePrefix%%.out" />
+  <Stderr dest="/lustre/expphy/work/halla/sbs/cornejo/gmn_acceptance/g4sbs/workspace/%%$jlabBatchLogFilePrefix%%.err" />
+</Job>
+</Request>

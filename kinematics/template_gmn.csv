@@ -1,0 +1,12 @@
+beam_e,%%$beam_e%%,GeV
+theta_bb,%%$theta_bb%%,&deg;
+theta_sbs,%%$theta_sbs%%,&deg;
+dist_bb,%%$dist_bb%%,m
+dist_mag,%%$dist_mag%%,m
+dist_hcal,%%$dist_hcal%%,m
+bdl,%%$bdl%%,Tm
+golden,%%$golden%%
+intFieldMap,%%$intFieldMap%%,Tm
+magScale,%%$magScale%%,
+Q2,%%$q2%%,GeV^2
+comment,&int;Bdl=%%$bdl%%Tm, dhcal=%%$dist_hcal%%m

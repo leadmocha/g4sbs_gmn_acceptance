@@ -1,0 +1,64 @@
+## Specify output file name
+/g4sbs/filename %%$visRootFileName%%
+
+## Then execute the generic kin%%$kin%% macro
+/control/execute %%$macroFileName%%
+
+# Use this open statement to create an OpenGL view:
+/vis/open OGLSQt 800x800-0+0
+
+# Disable auto refresh and quieten vis messages whilst scene and
+# trajectories are established:
+/vis/viewer/set/autoRefresh false
+/vis/verbose errors
+#
+# Draw geometry:
+/vis/drawVolume world
+#
+# Set specific colour for identification : ghost parallel geometry envelope ("ghost") as yellow
+#
+# Specify view angle:
+/vis/viewer/set/viewpointThetaPhi 90 90 deg
+/vis/viewer/panTo 4 4 m
+#
+# Specify zoom value:
+/vis/viewer/zoom 5.0
+
+# Many other options are available with /vis/modeling and /vis/filtering.
+# For example, to select colour by particle ID:
+/vis/modeling/trajectories/create/drawByParticleID
+/vis/modeling/trajectories/drawByParticleID-0/setDefault white
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA proton 0.86 0.08 0.23 1.0 # Crimson (red)
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA e- 0.53 0.80 0.92 1.00 # Sky Blue
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA neutron 0. 1.0 0.5 1.0 # Spring Green
+/vis/filtering/trajectories/create/particleFilter
+/vis/filtering/trajectories/particleFilter-0/add proton
+/vis/filtering/trajectories/particleFilter-0/add e-
+/vis/filtering/trajectories/particleFilter-0/add neutron
+#
+# To superimpose all of the events from a given run:
+/vis/scene/endOfEventAction accumulate
+#
+# Re-establish auto refreshing and verbosity:
+/vis/viewer/set/autoRefresh true
+/vis/verbose warnings
+
+# Draw coordinate axes:
+#/vis/scene/add/axes 0 0 0 1 m
+#
+# Draw smooth trajectories at end of event, showing trajectory points
+# as markers 2 pixels wide:
+/vis/scene/add/trajectories smooth
+/vis/scene/add/trajectories rich
+#/vis/modeling/trajectories/create/drawByCharge
+#/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+#/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+
+/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 2
+
+## Generate 1 event for the visualization software to work
+/g4sbs/run 0
+
+## Finally flush out the scene
+/vis/viewer/flush
