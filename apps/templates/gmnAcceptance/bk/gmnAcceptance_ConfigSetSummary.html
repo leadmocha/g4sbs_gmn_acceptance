@@ -1,0 +1,51 @@
+{% import "templates/gmnAcceptance_macros.html" as macs  with context %}
+<html lang="en">
+<head>
+<title>GMn Acceptance Studies: Golden Summary</title>
+<style>
+{%include "templates/gmnAcceptance_styles.css" ignore missing %}
+</style>
+</head>
+<body>
+
+{% set active_page = 'configsetsummary' -%}
+{%include "templates/gmnAcceptance_navbar.html" ignore missing %}
+
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=10 class='hcal_set_title'>Configuration/Set Details</td></tr>
+  <tr>
+    <td class='configandsetcol sepcol row_title'>Config/Set</td>
+    <td class='kincol sepcol row_title'>Kin</td>
+    <td class='q2col sepcol row_title'>{{macs.rowTitle('Q2',1)}}</td>
+    <td class='sepcol row_title'>E<sub>beam</sub><br />[{{info.unit['beam_e']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>bb</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>sbs</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>d<sub>bb</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>mag</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>hcal</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>{{macs.rowTitle('bdl',1)}}</td>
+  </tr>
+  {% for cs, kin_list in configsets.iteritems() %}
+  {% for k in kin_list %}
+  <tr {% if loop.index == 1 %} class="first_set_item" {% endif %}>
+    {% if loop.index == 1 %}
+    <td class='configandsetcol sepcol' rowspan="{{kin_list|length}}">{{macs.printSetConfigAnchor(k)}}</td>
+    {% endif %}
+    <td class="kincol sepcol"><pre class="{{k['golden_class']}}">{{k['kin']}}{% if k['golden'] %}&#8902;{% else %}&nbsp;{% endif %}</pre></td>
+    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+
+    {% for v in ('beam_e','theta_bb', 'theta_sbs', 'dist_bb', 'dist_mag', 'dist_hcal') %}
+    <td class='sepcol configvalcol'><pre>{{ '%5.2f'%k[v] }}</pre></td>
+    {% endfor %}
+    <td class='sepcol configvalcol'><pre>{{macs.printBdl(k['bdl'])}}</pre></td>
+  </tr>
+  {% endfor %}
+  {% endfor %}
+</table>
+{%include "templates/gmnAcceptance_footnotes.html" ignore missing %}
+<ul>
+<li><b>&#8902;</b> Marks the golden configuration for this kinematic.</li>
+</ul>
+{%include "templates/gmnAcceptance_definitions.html" ignore missing %}
+</body>
+</html>

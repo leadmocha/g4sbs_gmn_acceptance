@@ -1,0 +1,41 @@
+{% extends "templates/gmnAcceptance/Base.html" %}
+{% set active_page = 'configsetsummary' -%}
+
+{% block title %}Config/Set Summary{% endblock title %}
+
+{% block body %}
+
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=10 class='hcal_set_title'>Configuration/Set Details</td></tr>
+  <tr>
+    <td class='configandsetcol sepcol row_title'>Config/Set</td>
+    <td class='kincol sepcol row_title'>Kin</td>
+    <td class='q2col sepcol row_title'>{{ms.rowTitle('Q2',1)}}</td>
+    <td class='sepcol row_title'>E<sub>beam</sub><br />[{{info.unit['beam_e']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>bb</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>sbs</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>d<sub>bb</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>mag</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>hcal</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('bdl',1)}}</td>
+  </tr>
+  {% for cs, kin_list in configsets.iteritems() %}
+  {% for k in kin_list %}
+  <tr {% if loop.index == 1 %} class="first_set_item" {% endif %}>
+    {% if loop.index == 1 %}
+    <td class='configandsetcol sepcol' rowspan="{{kin_list|length}}">{{ms.printSetConfigAnchor(k)}}</td>
+    {% endif %}
+    <td class="kincol sepcol"><pre class="{{k['golden_class']}}">{{k['kin']}}{% if k['golden'] %}{{ms.addFootnote('&#8902;','Marks the golden configuration for this kinematic point.')}}{% else %}&nbsp;{% endif %}</pre></td>
+    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+
+    {% for v in ('beam_e','theta_bb', 'theta_sbs', 'dist_bb', 'dist_mag', 'dist_hcal') %}
+    <td class='sepcol configvalcol'><pre>{{ '%5.2f'%k[v] }}</pre></td>
+    {% endfor %}
+    <td class='sepcol configvalcol'><pre>{{ms.printBdl(k['bdl'])}}</pre></td>
+  </tr>
+  {% endfor %}
+  {% endfor %}
+</table>
+{{ms.printFootnotes()}}
+
+{% endblock body %}

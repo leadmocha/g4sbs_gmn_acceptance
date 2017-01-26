@@ -1,0 +1,133 @@
+{% extends "templates/gmnAcceptance/Base.html" %}
+
+{% set active_page = 'kin%02d'%golden['kin'] -%}
+
+{% block title %}{{'Kin%02d'%golden['kin']}}{% endblock title %}
+
+{% macro printIfNotError(val,type='') -%}{% if val != stdErrVal  %}{{ms.printV(val,type)}}{% endif %}{%- endmacro %}
+{% macro printValAndPDiff(r,val,row,useclass='',valType='') -%}
+<td class="{{useclass}} double_valued_cell" style="white-space: nowrap;"><pre>{{ms.printV(r['values'][val],valType)}}{% if row > 1 %} (<span class="{{ r['values']['class_%s'%val]}}">{{ms.printV(r['values']['pdiff_%s'%val],'pdiff')}}</span>){% else %}          {% endif %}</pre></td>{% endmacro %}
+
+{% block body scoped %}
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Kin {{ '%02d'%golden['kin'] }}: Golden Run Summary</td></tr>
+  <tr>
+    <td class='q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
+    <td class='configandsetcol sepcol row_title'rowspan=2>Config/Set</td>
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>Solid Angle &int;d&Omega;<br />[{{ info.unit['solid'] }}]</td>
+    <td rowspan=2 class='sepcol row_title'>{{ms.rowTitle('thetapq',1)}}</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>{{ms.rowTitle('thetapq_radius',1)}}</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>&lang;&Delta;Y<sub>P-N</sub>&rang;<br />[{{ info.unit['pn_vertical_sep'] }}]</td>
+    <td rowspan=2 class='sepcol row_title comment_cell'>Comment</td>
+  </tr>
+  <tr class="row_subtitle">
+    <td>Proton</td>
+    <td>Neutron</td>
+  </tr>
+  <tr>
+    <td class='q2col sepcol'>{{ golden['Q2'] }}</td>
+    <td class='configandsetcol sepcol'>{{ms.printSetConfigLink(golden)}}</td>
+
+    <td><pre>{{ms.printSigma(golden['values']['total_sigma_proton'])}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printSigma(golden['values']['total_sigma_neutron'])}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(golden['values']['average_solid'])}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(golden['values']['thetapq'],'angle')}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(golden['values']['thetapq_radius'])}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(golden['values']['pn_vertical_sep'])}}</pre></td>
+    <td class='sepcol'>{{golden['comment']}}</td>
+  </tr>
+</table>
+{{ms.printFootnotes()}}
+
+{% if results|length > 1 %}
+<table class="hcal_set_table" style="table-layout: fixed;">
+  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Kin {{ '%02d'%golden['kin'] }}: Comparison to Golden Run</td></tr>
+  <tr>
+    <td class='q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
+    <td class='configandsetcol sepcol row_title'rowspan=2>Config/Set</td>
+    <td colspan="2" class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
+    <td rowspan="2" class='sepcol row_title double_valued_cell'>Solid Angle &int;d&Omega;<br />[{{ info.unit['solid'] }}]</td>
+    <td rowspan="2" class='sepcol row_title'>{{ms.rowTitle('thetapq',1)}}</td>
+    <td rowspan="2" class='sepcol row_title'>{{ms.rowTitle('thetapq_radius',1)}}</td>
+    <td rowspan="2" class='sepcol row_title'>&lang;&Delta;Y<sub>P-N</sub>&rang;<br />[{{ info.unit['pn_vertical_sep'] }}]</td>
+    <td rowspan=2 class='sepcol row_title comment_cell'>Comment</td>
+  </tr>
+  <tr class="row_subtitle">
+    <td>Proton</td>
+    <td>Neutron</td>
+  </tr>
+  {% for r in results %}
+  <tr {% if loop.index > 1 %} class="first_set_item" {% endif %}>
+    <td class='q2col sepcol'>{{ r['Q2'] }}</td>
+    <td class='configandsetcol sepcol'>{{ms.printSetConfigLink(r)}}</td>
+
+    {{ printValAndPDiff(r,'total_sigma_proton',loop.index,'','sigma') }}
+    {{ printValAndPDiff(r,'total_sigma_neutron',loop.index,'sepcol','sigma') }}
+    {{ printValAndPDiff(r,'average_solid',loop.index,'sepcol') }}
+    {{ printValAndPDiff(r,'thetapq',loop.index,'sepcol','angle') }}
+    {{ printValAndPDiff(r,'thetapq_radius',loop.index,'sepcol') }}
+    {{ printValAndPDiff(r,'pn_vertical_sep',loop.index,'sepcol') }}
+    <td class='sepcol'>{{r['comment']}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{{ms.printFootnotes()}}
+{% endif %}
+
+
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Kin {{ '%02d'%golden['kin'] }}: Particle Identification Comparisons</td></tr>
+  <tr>
+    <td class='q2col sepcol row_title' rowspan=3>{{ms.rowTitle('Q2',0)}}</td>
+    <td class='configandsetcol sepcol row_title'rowspan=3>Config/Set</td>
+    <td class='q2col sepcol row_title' rowspan=3>{{ms.rowTitle('dmz',1)}}</td>
+
+    <td class='sepcol row_title' colspan='6'>{{ms.rowTitle('negID',1)}}</td>
+    <td class='sepcol row_title' colspan='4'>{{ms.rowTitle('posID',1)}}</td>
+    <td class='sepcol row_title' rowspan='3'>{{ms.rowTitle('pdiff_ratio_overestimate',1)}}</td>
+  </tr>
+  <tr class="row_title2">
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerTotal',1)}}</td>
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerFirst',1)}}</td>
+
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('sigma',1)}}</td>
+    <td colspan=2 class='sepcol row_title'>{{ms.rowTitle('IDPerFirst',1)}}</td>
+  </tr>
+  <tr class="row_subtitle">
+    <td>Proton</td><td class='sepcol'>Neutron</td>
+    <td>Proton</td><td class='sepcol'>Neutron</td>
+    <td>Proton</td><td class='sepcol'>Neutron</td>
+    <td>Proton</td><td class='sepcol'>Neutron</td>
+    <td>Proton</td><td class='sepcol'>Neutron</td>
+  </tr>
+  {% for kin_config in results %}
+  {% set kin_config_index = loop.index %}
+  {% for ex in kin_config['exclusions'] %}
+  <tr {% if loop.index == 1 and kin_config_index > 1 %} class="first_set_item" {% endif %}>
+    {% if loop.index == 1 %}
+    <td class='q2col sepcol' rowspan="{{kin_config['exclusions']|length}}">{{kin_config['Q2']}}</td>
+    <td class='configandsetcol sepcol'rowspan="{{kin_config['exclusions']|length}}">{{ms.printSetConfigLink(kin_config)}}</td>
+    {% endif %}
+    <td class='dmzcol sepcol'><pre>{{ms.printV(ex.dmz,'dmz')}}</pre></td>
+
+    <td><pre>{{ms.printV(ex.negPSigmaID,'sigmaID')}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(ex.negNSigmaID,'sigmaID')}}</pre></td>
+    <td><pre class="{{ex.class_negPSigmaIDPerTotal}}">{{ms.printV(ex.negPSigmaIDPerTotal,'percent')}}</pre></td>
+    <td class='sepcol'><pre class="{{ ex.class_negPSigmaIDPerTotal }}">{{ms.printV(ex.negNSigmaIDPerTotal,'percent')}}</pre></td>
+    <td><pre class='{{ex.class_negPSigmaIDPerFirst}}'>{{printIfNotError(ex.negPSigmaIDPerFirst,'pdiffn')}}</pre></td>
+    <td class='sepcol'><pre class='{{ex.class_negNSigmaIDPerFirst}}'>{{printIfNotError(ex.negNSigmaIDPerFirst,'pdiffn')}}</pre></td>
+
+    <td><pre>{{ms.printV(ex.posPSigmaID,'sigmaID')}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(ex.posNSigmaID,'sigmaID')}}</pre></td>
+    <td><pre class='{{ex.class_posPSigmaIDPerFirst}}'>{{printIfNotError(ex.posPSigmaIDPerFirst,'pdiffn')}}</pre></td>
+    <td class='sepcol'><pre class='{{ex.class_posNSigmaIDPerFirst}}'>{{printIfNotError(ex.posNSigmaIDPerFirst,'pdiffn')}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(ex.pdiff_ratio_overestimate,'pdiff')}}</pre></td>
+  </tr>
+  {% endfor %}
+  {% endfor %}
+</table>
+{{ms.printFootnotes(0)}}
+
+{% endblock body %}

@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+from GMnDB import *
+db = GMnDB()
+
+import os ## Access os features (like modifying filesystem)
+from jinja2 import Environment, FileSystemLoader
+j2_env = Environment(loader=FileSystemLoader(os.path.dirname(os.path.abspath(__file__))))
+template = j2_env.get_template('templates/template_fieldClampStudy.html')
+
+## Main Function (program starts here)
+def main():
+  ## Load up the results database
+  db.loadDB()
+
+  noclamp = db.getConfigSet('october_v2',0)
+  withclamp = db.getConfigSet('october',0)
+  #print(noclamp)
+  #print(withclamp)
+  voffs = [15,45]
+  hcal_sets = []
+  for hcal_voff in voffs:
+    hcal_set = {}
+    hcal_set['voff'] = hcal_voff
+    hcal_set['kins'] = []
+    print "------------------------------------------------------------------"
+    print "------------------------------------------------------------------"
+    print "HCal Height = %d cm" % hcal_voff
+    print "-------------------"
+    print "    |      Proton Sigma(nb)        |      Neutron Sigma(nb)       "
+    print "Kin |  noclamp     clamp     %diff |  noclamp     clamp     %diff "
+    print "--- | ---------  ----------  ----- | ---------  ----------  ----- "
+    for kin in range(1,7):
+      psn = noclamp[kin].hcal_set[hcal_voff].values['total_sigma_proton']
+      psw = withclamp[kin].hcal_set[hcal_voff].values['total_sigma_proton']
+      psdiff = 100*(psw/psn-1)
+      nsn = noclamp[kin].hcal_set[hcal_voff].values['total_sigma_neutron']
+      nsw = withclamp[kin].hcal_set[hcal_voff].values['total_sigma_neutron']
+      nsdiff = 100*(nsw/nsn-1)
+      print " %d  | %9.6f  %9.6f   %5.2f | %9.6f  %9.6f   %5.2f " % (kin,psn,psw,psdiff,
+          nsn,nsw,nsdiff)
+      kin_res = {}
+      kin_res['kin'] = kin
+      hcal_set['kins'].append(kin_res)
+    hcal_sets.append(hcal_set);
+  print "------------------------------------------------------------------"
+  print "------------------------------------------------------------------"
+  out = file('results/db/web/fieldClampStudy.html','w')
+  out.write(template.render(hcal_sets=hcal_sets))
+
+  #db.printDebug()
+
+## Run main() function if this file is run directly in the command line
+## (as opposed to being imported)
+if __name__ == '__main__':
+  main()

@@ -1,0 +1,54 @@
+{% extends "templates/gmnAcceptance/base.html" %}
+
+{% import "templates/gmnAcceptance_macros.html" as macs with context %}
+<html lang="en">
+<head>
+<title>GMn Acceptance Studies: Golden Summary</title>
+<style>
+{%include "templates/gmnAcceptance_styles.css" ignore missing %}
+</style>
+</head>
+<body>
+
+{% set active_page = active_page|default('goldensummary') -%}
+{%include "templates/gmnAcceptance_navbar.html" ignore missing %}
+
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=9 class='hcal_set_title'>Quick Summary of Golden Runs</td></tr>
+  <tr>
+    <td class='kincol sepcol row_title' rowspan=2>Kin</td>
+    <td class='q2col sepcol row_title'rowspan=2>{{macs.rowTitle('Q2',0)}}</td>
+    <td class='configandsetcol sepcol row_title'rowspan=2>Config/Set</td>
+    <td colspan=2 class='sepcol row_title'>Cross Section &int;&sigma;d&Omega;<br />[{{ info.unit['sigma'] }}]</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>Solid Angle &int;d&Omega;<br />[{{ info.unit['solid'] }}]</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>{{macs.rowTitle('thetapq_radius',1)}}</td>
+    <td rowspan=2 class='sepcol row_title extended_cell'>{{macs.rowTitle("pn_vertical_sep",1)}}</td>
+    <td rowspan=2 class='sepcol row_title comment_cell'>Comment</td>
+  </tr>
+  <tr class="row_subtitle">
+    <td>Proton</td>
+    <td>Neutron</td>
+    <!--
+    <td>Proton</td>
+    <td class='sepcol'>Neutron</td>
+    -->
+  </tr>
+  {% for k in goldens %}
+  <tr {% if loop.index > 1 %} class="first_set_item" {% endif %}>
+    <td class='kincol sepcol'>{{ k['kin'] }}</td>
+    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+    <td class='configandsetcol sepcol'>{{macs.printSetConfigLink(k)}}</td>
+
+    <td><pre>{{macs.printSigma(k['values']['total_sigma_proton'])}}</pre></td>
+    <td class='sepcol'><pre>{{macs.printSigma(k['values']['total_sigma_neutron'])}}</pre></td>
+    <td class='sepcol'><pre>{{ '%8.5f'%k['values']['total_solid_proton'] }}</pre></td>
+    <td class='sepcol'><pre>{{ '%8.5f'%k['values']['thetapq_radius'] }}</pre></td>
+    <td class='sepcol'><pre>{{ '%8.5f'%k['values']['pn_vertical_sep'] }}</pre></td>
+    <td class='sepcol comment_cell'>{{ k['comment'] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{%include "templates/gmnAcceptance_definitions.html" ignore missing %}
+</body>
+</html>

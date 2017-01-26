@@ -1,0 +1,79 @@
+## A class of data for each hcal setting in a kin
+class GMnKinHCalData:
+  def __init__(self):
+    self.values = {}
+    self.units = {}
+    self.exclusions = []
+
+
+## A class of data for each kin setting
+class GMnKin:
+  def __init__(self,kin,config,setID):
+    self.kin = kin
+    self.config = config ## I also call this dateCmd or date in some scripts
+    self.setID = setID
+    self.golden = False
+    self.comment = ''
+
+  ## Print out details of this kin set
+  def __repr__(self):
+    result = 'kin=%02d,config=%s,set=%d'% (self.kin, self.config, self.setID)
+    result += ',pn_vertical_sep=%g %s' % (self.values['pn_vertical_sep'],
+        self.units['pn_vertical_sep'])
+    for ex in self.exclusions:
+      result += ex.__repr__()
+    return result
+
+  ## Compare Kin sets for sorting purposes
+  def __cmp__(self,other):
+    ## Sort by kin, config, setID
+    if self.kin == other.kin:
+      if self.config == other.config:
+        return other.setID - other.setID
+      else:
+        return 2*(self.config.lower() < other.config.lower())-1
+    else:
+      return self.kin - other.kin
+
+  def readData(self,csv):
+    f = open(csv,'r')
+    for line in f:
+      items = line.strip().split(',')
+      ## Skip empty lines
+      if len(items) < 2:
+        continue
+
+      ## Check special valued lines
+      if items[0] == 'golden':
+        if (items[1].lower() == 'yes' or items[1].lower() == '1'):
+          self.golden = True
+        else:
+          self.golden = False ## The default, but doesn't hurt to set it again
+      elif items[0] == 'exclusion_zone':
+        ex = ExclusionData(items[1],
+            items[2],items[3],items[4],items[5],
+            items[6],items[7],items[8],items[9])
+        self.exclusions.append(ex)
+      elif items[0] == 'comment':
+        self.comment = items[1]
+      else:
+        self.values[items[0]] = float(items[1])
+        if len(items) > 2:
+          self.units[items[0]] = items[2]
+
+  def writeKinSummary(self):
+    printStartRow()
+    printCell('%2d'%self.kin,'default')
+    printCell(self.config,'default')
+    printCell(self.values['total_sigma_proton'],'default')
+    printCell(self.values['total_sigma_neutron'],'default')
+    printCell(self.values['pn_vertical_sep'],'default')
+    printCell(self.values['thetapq_radius'],'default')
+    printCell(self.comment,'default')
+    printEndRow()
+    #print "%2d  %s %2d  %12.8f %12.8f %12.8f %12.8f    %s" % (self.kin,self.config.center(10),
+    #    self.setID,
+    #    self.values['total_sigma_proton'], self.values['total_sigma_neutron'],
+    #    self.values['pn_vertical_sep'],self.values['thetapq_radius'],self.comment
+    #    )
+

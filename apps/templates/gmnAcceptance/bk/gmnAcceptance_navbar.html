@@ -1,0 +1,61 @@
+<style>
+
+#navigation ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e7e7e7;
+  background-color: #e0e0e0;
+}
+
+#navigation li {
+  float: left;
+}
+
+#navigation li a {
+  font-weight: bold;
+  display: block;
+  color: #666;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+#navigation li a:hover:not(.active) {
+  background-color: #666;
+  color: white;
+}
+
+#navigation li a.active {
+  color: white;
+  background-color: #b00;
+}
+
+@media print {
+   #navigation ul {
+         display: none !important;
+   }
+}
+
+</style>
+<div id="navigation">
+{% set navigation_bar = [
+    ('gmnAcceptance_GoldenSummary.html', 'goldensummary', 'Golden Summary'),
+    ('gmnAcceptance_Kin01_Summary.html', 'kin01', 'Kin01'),
+    ('gmnAcceptance_Kin02_Summary.html', 'kin02', 'Kin02'),
+    ('gmnAcceptance_Kin03_Summary.html', 'kin03', 'Kin03'),
+    ('gmnAcceptance_Kin04_Summary.html', 'kin04', 'Kin04'),
+    ('gmnAcceptance_Kin05_Summary.html', 'kin05', 'Kin05'),
+    ('gmnAcceptance_Kin06_Summary.html', 'kin06', 'Kin06'),
+    ('gmnAcceptance_Kin07_Summary.html', 'kin07', 'Kin07'),
+    ('gmnAcceptance_ConfigSetSummary.html', 'configsetsummary', 'Config/Set Info'),
+] -%}
+{% set active_page = active_page|default('goldensummary') -%}
+
+<ul id="navigation">
+{% for href, id, caption in navigation_bar %}
+<li><a class="navigation{% if id == active_page %} active{% endif %}" href="{{ href|e }}">{{ caption|e }}</a></li>
+{% endfor %}
+</ul>
+</div>

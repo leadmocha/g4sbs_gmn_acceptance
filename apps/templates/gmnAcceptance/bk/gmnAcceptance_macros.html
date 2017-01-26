@@ -1,0 +1,28 @@
+{% macro printSetConfigLink(v) -%}
+<a href="gmnAcceptance_ConfigSetSummary.html#{{v['config']}}/{{v['set']}}" class="configset_link">{{v['config']}}/{{v['set']}}</a>
+{%- endmacro %}
+
+{% macro printSetConfigAnchor(v) -%}
+  <a name="{{v['config']}}/{{v['set']}}"></a>{{v['config']}}/{{v['set']}}
+{%- endmacro %}
+
+{% macro printSigma(v) -%}{{'%9.6f'%v}}{%- endmacro%}
+{% macro printExSigma(v) -%}{{'%9.6f'%v}}{%- endmacro%}
+
+{% set footnotes={} %}
+{% macro addFootnote(symbol='',note='') -%}{% if symbol == '' %}{% set symbol = '(%d)'%(footnotes|length+1) %}{% endif %}{% if note != '' %}{% set _ = footnotes.update({symbol:note}) %}{% endif %}<sup>{{symbol}}</sup>{% endmacro %}
+
+{% set defsShown={} %}
+{% macro rowTitle(name,showDefinition) -%}{{info.title[name]}}{% if info.unit[name] != '' %}<br />[{{info.unit[name]}}]{% endif %}{% if showDefinition and info.definition[name] != '' %}{% set _ = defsShown.update({name:1}) %}{% endif %}{%- endmacro %}
+
+{# Prints the Bdl and adds a footnote if the bdl is at (or beyond) max Bdl #}
+{% macro printBdl(bdl) -%}{{'%5.2f'%bdl}}
+{%- if bdl == info.maxBdl -%}
+{{addFootnote('&dagger;','SBS Field integral is at maximum.')}}
+{%- elif bdl > info.maxBdl -%}
+{{addFootnote('&Dagger;','SBS Field integral is <b>greater than the maximum possible</b>.')}}
+{%- else -%}
+&nbsp;{% endif -%}
+{%- endmacro %}
+
+
