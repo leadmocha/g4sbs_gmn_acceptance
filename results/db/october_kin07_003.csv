@@ -6,7 +6,7 @@ dist_bb,1.55,m
 dist_mag,3.1,m
 dist_hcal,17.0,m
 bdl,0.97,Tm
-golden,no
+golden,yes
 intFieldMap,1.73824,Tm
 magScale,0.558035714285714,
 Q2,13.5,GeV^2
