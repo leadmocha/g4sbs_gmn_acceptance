@@ -5,8 +5,8 @@
 /logs/
 /backups/
 /old/
-/results/
-!results/db
+results/*
+!/results/db/
 /rootfiles
 /tst.tst
 /tst_batch/
