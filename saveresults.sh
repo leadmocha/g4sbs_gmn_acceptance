@@ -7,6 +7,7 @@ for (( i=0; i<${#kinlist}; i++ )); do
   kin=${kinlist:$i:1}
   if [ $kin -lt 1 -o $kin -gt 7 ]; then
     echo "Skipping bad kin number: $kin"
+    continue ## Skip bad kin number
   fi
   kin=$(printf "%02d" $kin)
   echo $kin
