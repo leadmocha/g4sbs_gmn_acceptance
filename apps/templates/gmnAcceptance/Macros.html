@@ -30,7 +30,7 @@
 {% macro addFootnote(symbol='',note='') -%}{% if symbol == '' %}{% set symbol = '(%d)'%(footnotes|length+1) %}{% endif %}{% if note != '' %}{% set _ = footnotes.update({symbol:note}) %}{% endif %}<sup>{{symbol}}</sup>{% endmacro %}
 
 {% set defsShown={} %}
-{% macro rowTitle(name,showDefinition) -%}{{info.title[name]}}{% if info.unit[name] != '' %}<br />[{{info.unit[name]}}]{% endif %}{% if showDefinition and info.definition[name] != '' %}{% set _ = defsShown.update({name:1}) %}{% endif %}{%- endmacro %}
+{% macro rowTitle(name,showDefinition) -%}{% if not info.title[name] %}{{name}}{% else %}{{info.title[name]}}{% endif %}{% if info.unit[name] and info.unit[name] != '' %}<br />[{{info.unit[name]}}]{% endif %}{% if showDefinition and info.title[name] and info.definition[name] != '' %}{% set _ = defsShown.update({name:1}) %}{% endif %}{%- endmacro %}
 {% macro printFootnotes(what=0) -%}
 {# {%- if footnotes|length -%} #}
 <div class="footnotes">
@@ -52,3 +52,4 @@
 &nbsp;{% endif -%}
 {%- endmacro %}
 
+{% macro colTitle(name,showDefinition,class1="",class2="") -%}<td class="col_title {{class1}}">{% if not info.title[name] %}{{name}}{% else %}{{info.title[name]}}{% endif %}</td><td class="col_unit sepcol {{class2}}">{% if info.unit[name] and info.unit[name] != '' %}[{{info.unit[name]}}]{% endif %}{% if showDefinition and info.title[name] and info.definition[name] != '' %}{% set _ = defsShown.update({name:1}) %}{% endif %}</td>{%- endmacro %}

@@ -1,12 +1,13 @@
 {% extends "templates/gmnAcceptance/Base.html" %}
 {% set active_page = 'configsetsummary' -%}
+{## My custom macro ##}
 
 {% block title %}Config/Set Summary{% endblock title %}
 
 {% block body %}
 
 <table class="hcal_set_table">
-  <tr class="row_title"><td colspan=10 class='hcal_set_title'>Configuration/Set Details</td></tr>
+  <tr class="row_title"><td colspan="42" class='hcal_set_title'>Configuration/Set Details</td></tr>
   <tr>
     <td class='configandsetcol sepcol row_title'>Config/Set</td>
     <td class='kincol sepcol row_title'>Kin</td>
@@ -18,6 +19,8 @@
     <td class='sepcol row_title'>d<sub>mag</sub><br />[{{info.unit['det_distance']}}]</td>
     <td class='sepcol row_title'>d<sub>hcal</sub><br />[{{info.unit['det_distance']}}]</td>
     <td class='sepcol row_title'>{{ms.rowTitle('bdl',1)}}</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('scat_e_p',1)}}</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('scat_h_p',1)}}</td>
   </tr>
   {% for cs, kin_list in configsets.iteritems() %}
   {% for k in kin_list %}
@@ -29,13 +32,46 @@
     <td class='q2col sepcol'>{{ k['Q2'] }}</td>
 
     {% for v in ('beam_e','theta_bb', 'theta_sbs', 'dist_bb', 'dist_mag', 'dist_hcal') %}
-    <td class='sepcol configvalcol'><pre>{{ '%5.2f'%k[v] }}</pre></td>
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k[v]}}</pre></td>
     {% endfor %}
     <td class='sepcol configvalcol'><pre>{{ms.printBdl(k['bdl'])}}</pre></td>
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_e_p']}}</pre></td>
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_h_p']}}</pre></td>
   </tr>
   {% endfor %}
   {% endfor %}
 </table>
 {{ms.printFootnotes()}}
 
+
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan="42" class='hcal_set_title'>Information from the Proposal</td></tr>
+  <tr class="sepcol row_title">
+    {{ms.colTitle('Kin',0,'proposal_col_title')}}
+  {% for kin in range(1,8) %}
+    <td class='sepcol configvalcol'><pre>{{kin}}</pre></td>
+  {% endfor %}
+  </tr>
+  <tr class="seprow">
+    {{ms.colTitle('Q2',0,'proposal_col_title')}}
+    {% for k in proposal['Q2'] %}
+    {% if loop.index > 1 %}
+    <td class='sepcol configvalcol'><pre>{{k}}</pre></td>
+    {% endif %}
+    {% endfor %}
+  </tr>
+
+  {% for var,kins in proposal.iteritems() %}
+  {% if var != 'Q2' %}
+  <tr class="seprow">
+    {{ms.colTitle(var,1,'proposal_col_title')}}
+    {% for k in kins %}
+    {% if loop.index > 1 %}
+    <td class='sepcol configvalcol'><pre>{{k}}</pre></td>
+    {% endif %}
+    {% endfor %}
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
 {% endblock body %}

@@ -16,6 +16,7 @@ PerTotal_EffectThr = 0.99
 import math;
 
 from GMnKinCalculator import *
+from GMnProposalInfo import *
 
 from GMnDB import *
 db = GMnDB()
@@ -66,23 +67,15 @@ def getEfficiency(momentum,particle):
       return 0.95;
   return 0.0
 
-## Get the proposed luminosities
-def getLuminosity(kin):
-  ## Given in 10x38/cm^2/sec
-  lumis =  (0, 0.7, 1.4, 2.8, 2.9, 1.4, 2.8, 1.5)
-  return lumis[kin]
-def getRunningTime(kin):
-  ## Hours from the updated proposal
-  hours = (0, 12, 12, 18, 18, 24, 48, 96 )
-  return hours[kin]*3600 ## return value is in seconds
 def getIntLuminosity(kin):
   ## Given in 10x38
-  return getLuminosity(kin)*getRunningTime(kin)
+  return float(GMnProposalInfo['Luminosity'][kin])*(float(
+      GMnProposalInfo['RunningTime'][kin])*3600)
 def computeStats(sigmaN,sigmaP,kin):
   ## Multiplier that takes into accoun 10x38 from Luminosity and
   ## 10x-36 from sigma (in pb)
   mult = 100;
-  intLumi = getLuminosity(kin)*getRunningTime(kin)
+  intLumi = getIntLuminosity(kin)
   eventsN = sigmaN*intLumi*mult;
   eventsP = sigmaP*intLumi*mult;
   errN = 1.0/math.sqrt(eventsN)
@@ -294,6 +287,9 @@ class ConfigSet:
     self.vals['config'] = config
     self.vals['set'] = setID
     self.vals['golden'] = golden
+    #self.vals['luminosity'] = GMnProposalInfo[kin]['Luminosity']
+    #self.vals['running_time'] = GMnProposalInfo[kin]['RunningTime']
+    self.vals['integrated_luminosity'] = getIntLuminosity(kin)
     if golden:
       self.vals['golden_class'] = 'golden_kin'
     ## Calculate some of the outgoing energies
@@ -319,6 +315,9 @@ def main():
 
   ## Load up the results database
   db.loadDB()
+
+  ## Load up the proposal information
+  readGMnProposal()
 
   ## A variable that will hold all the results
   goldens = []
@@ -380,7 +379,7 @@ def main():
   #configsets.sort()
   outConfigSetSummary = file ('results/db/web/gmnAcceptance_ConfigSetSummary.html','w')
   outConfigSetSummary.write(template_ConfigSetSummary.render(
-    configsets=configsets,info=info).encode('utf-8'))
+    configsets=configsets,info=info,proposal=GMnProposalInfo).encode('utf-8'))
 
   ## Copy the style sheet over too
   outStyle = file('results/db/web/gmnAcceptance_style.css','w')

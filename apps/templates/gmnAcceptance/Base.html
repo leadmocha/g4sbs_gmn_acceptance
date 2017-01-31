@@ -5,24 +5,28 @@
   {% block head scoped %}
   <title>GMn Acceptance Studies: {% block title scoped %}{% endblock title %}</title>
   <link rel="stylesheet" href="gmnAcceptance_style.css" />
-  <!--
-  <script type="text/javascript" src="/~cornejo/public/MathJax/MathJax.js"></script>
-  <script type="text/javascript" src="/~cornejo/public/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+  <!-- <script type="text/javascript" src="/~cornejo/public/MathJax/MathJax.js"></script> -->
   {% block styles scoped %}
   <style>
   </style>
   {% endblock styles %}
   {% endblock head %}
+  <!--
   <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-              extensions: ["tex2jax.js"],
-    jax: ["input/TeX","output/HTML-CSS"],
-    tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/CommonHTML"],
+    tex2jax: {
+      inlineMath: [ ["\\(","\\)"] ],
+      processEscapes: true
+    },
+    CommonHTML: {
+      scale: 100
+    },
   });
   </script>
-  <script type="text/javascript"
-   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
-  </script>
+  <script type="text/javascript" src="/~cornejo/public/MathJax/MathJax.js"></script>
+  -->
 </head>
 <body>
 {% set active_page = active_page|default('goldensummary') -%}
@@ -59,7 +63,7 @@
 {% if ms.defsShown|length %}
 <div class="definitions">
 <h1>Glossary:</h1>
-<ul>
+<ul class="definitions">
   {% for key,val in ms.defsShown.iteritems()  if info.definition[key] != '' %}
   <li><b>{{info.title[key]}}:</b> {{info.definition[key]}}</li>
   {% endfor -%}

@@ -7,7 +7,7 @@ class StdGMnInfo:
     self.maxBdl = 1e6 # To be set by user, default is ridiculous
 
   ## Add a new definition
-  def add(self,var,title='',unit='',definition=''):
+  def add(self,var,title='',unit='',definition='',footnote=''):
     self.title[var]      = title
     self.unit[var]       = unit
     self.definition[var] = definition
@@ -46,7 +46,14 @@ info.add('IDPerFirst','%-Diff of First Row','','Percent Difference of this value
 #info.add('ratio_posID','&sigma;<sub>n</sub>/&sigma;<sub>p</sub>','','Percent difference of the ')
 info.add('ratio_posID','R<sub></sub>','','')
 info.add('ratio_measured','R<sub>meas</sub>','','')
-info.add('pdiff_ratio_overestimate','%-Diff','','Percent difference of the ')
+info.add('pdiff_ratio_overestimate','%-Diff','','')
 info.add('ratio_eff_posID','R<sub></sub>','','')
 info.add('ratio_eff_measured','R<sub>meas</sub>','','')
-info.add('pdiff_ratio_eff_overestimate','%-Diff','','Percent difference of the ')
+info.add('pdiff_ratio_eff_overestimate','%-Diff','','')
+info.add('Luminosity','Luminosity',u'x10\u00B3\u2078/cm\u00B2s','','Taken from the proposal')
+info.add('RunningTime','Running Time','hr','','Taken from the proposal')
+info.add('InelPContam','Inelastic Proton Contamination (bkg/total)','%','','Taken from the proposal')
+info.add('InelNContam','Inelastic Neutron Contamination (bkg/total)','%','','Taken from the proposal')
+info.add('scat_e_p','P<sub>e\'</sub>','GeV/c','','')
+info.add('scat_h_p','P<sub>h\'</sub>','GeV/c','','')
+info.add('stat_error','Estimated Statistical Error','',u'Statistical errors for &sigma;<sub>n,p</sub> are estimated by &delta;&sigma;<sub>h</sub>\u22481/\u221AN<sub>h</sub>, where N<sub>h</sub> = &sigma;<sub>h</sub>&int;Ldt, L is the Luminosity and t is the running time in seconds. The statistical error for R is then taken as &delta;R = \u221A( &delta;&sigma;<sub>n</sub>\u00B2 +  &delta;&sigma;<sub>p</sub>\u00B2 ).','')
