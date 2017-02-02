@@ -1,0 +1,14 @@
+##  Kinematics & settings for GMn experiment
+##  These are the proposal values and may not necessarily reflect the
+##  current working values
+##  Q^2   E_beam  theta_bb  theta_sbs   dist_bb   dist_mag  dist_hcal   Bdl     gen? gold?
+1   3.5     4.4   32.5      31.1        1.55      1.60       6.2        1.4     no   no
+2   4.5     4.4   41.9      24.7        1.55      1.60       6.2        1.7     no   no
+3   6.0     4.4   64.3      15.6        1.55      1.60      11.0        0.7     no   no
+4   8.5     6.6   46.5      16.2        1.55      1.60      11.0        1.2     no   no
+5   10.0    8.8   33.3      17.9        1.55      1.60      13.0        1.3     no   no
+6   12.0    8.8   44.2      13.3        1.55      1.80      14.0        1.2     no   no
+7   13.5    8.8   58.5       9.8        1.55      2.50      17.0        0.9     no   no
+## Note: Max according to Robin is 1.71 T-m or 1.0528 T for GMn setting
+## 10/06/2016: Simulations will now have the front clamp on and use a
+## TOSCA map from Bogdan.
