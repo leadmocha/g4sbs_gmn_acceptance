@@ -3,14 +3,18 @@
 ##Kin               1       2       3       4       5       6       7
 Q2                  3.5     4.5     5.7     8.1     10.2    12.0    13.5
 ##=============================================================================
-Luminosity          0.7     1.4     2.8     2.8     1.4     2.8     1.5
+Luminosity          0.7     1.4     2.8     2.8     1.4     2.8     2.8
 RunningTime         12      12      18      18      24      48      96
+RunningTimeLHalf    12      12      12      12      0       0       0
+RunningTimeL10Per   12      12      0       0       0       0       0
 InelPContam         0.5     2.1     8.64    7.8     6.3     10.5    13.8
 InelNContam         1.3     5.2     15.5    17.4    16.0    19.8    28.0
+SigmaPCoin          890     570     69      30.4    32.0    5.9     1.35
+SigmaNCoin          380     250     31      13.9    15.     2.7     0.63
 ##=============================================================================
 ##  Notes:
-##  Luminosity: given in units of x10^38/cm^2/s. All come from the proposal except
-##    kinematic 7 which Brian gave me (due to the energy change).
+##  Luminosity: given in units of x10^38/A/cm^2/s. All come from the proposal
+##    except kinematic 7 which Brian gave me (due to the energy change).
 ##  RunningTime: Taken from the original proposal (by adding up all the
 ##    different running conditions (i.e. L + 1/2 L + 0.1 L)
 ##  InelPContam (InelNComam): Contamination of Proton (Neutron) inelastic
