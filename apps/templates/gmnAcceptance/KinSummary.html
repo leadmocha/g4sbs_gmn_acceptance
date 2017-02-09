@@ -51,10 +51,10 @@
 
     {{printValAndPDiff(r,'total_sigma_proton',loop.index,'','sigma',loop_count)}}
     {{printValAndPDiff(r,'total_sigma_neutron',loop.index,'sepcol','sigma',loop_count)}}
-    {{printValAndPDiff(r,'average_solid',loop.index,'sepcol',loop_count)}}
+    {{printValAndPDiff(r,'average_solid',loop.index,'sepcol','',loop_count)}}
     {{printValAndPDiff(r,'thetapq',loop.index,'sepcol','angle',loop_count)}}
-    {{printValAndPDiff(r,'thetapq_radius',loop.index,'sepcol',loop_count)}}
-    {{printValAndPDiff(r,'pn_vertical_sep',loop.index,'sepcol',loop_count)}}
+    {{printValAndPDiff(r,'thetapq_radius',loop.index,'sepcol','',loop_count)}}
+    {{printValAndPDiff(r,'pn_vertical_sep',loop.index,'sepcol','',loop_count)}}
     <td class='sepcol'>{{r['comment']}}</td>
   </tr>
   {% endfor %}
