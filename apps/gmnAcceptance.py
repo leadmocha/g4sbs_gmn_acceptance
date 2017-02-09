@@ -32,6 +32,7 @@ stdErrVal = -4e-6
 ## So we can make a default dictionary of lists
 from collections import defaultdict
 configsets = defaultdict(list)
+configsetsgolden = []
 currentConfig = None
 
 def getIntLuminosity(kin):
@@ -350,6 +351,7 @@ def main():
     goldens.append(golden)
     results['golden'].append(golden)
     configsets['%s/%s'%(tmp.config,tmp.setID)].append(currentConfig)
+    configsetsgolden.append(currentConfig)
 
     ## Get the other non golden kinematics
     otherKins = db.getNonGoldenByKin(kin)
@@ -387,7 +389,7 @@ def main():
   #out = file('results/db/web/gmnAcceptance.html','w')
   outGoldenSummary = file ('results/db/web/gmnAcceptance_GoldenSummary.html','w')
   outGoldenSummary.write(template_GoldenSummary.render(
-    goldens=goldens,info=info).encode('utf-8'))
+    goldens=goldens,configsetsgolden=configsetsgolden,info=info).encode('utf-8'))
 
   for i in configsets:
     configsets[i].sort()

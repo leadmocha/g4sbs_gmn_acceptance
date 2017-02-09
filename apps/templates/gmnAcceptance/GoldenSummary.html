@@ -8,7 +8,7 @@
 
 {% block body %}
 <table class="hcal_set_table">
-  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Quick Summary of Golden Runs</td></tr>
+  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Quick Summary of the "Golden" Settings</td></tr>
   <tr>
     <td class='kincol sepcol row_title' rowspan=2>Kin</td>
     <td class='conf_q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
@@ -45,4 +45,37 @@
   {% endfor %}
 </table>{{ms.printFootnotes()}}
 
-{% endblock %}
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan="42" class='hcal_set_title'>Beam and Spectrometer Configurations for "Golden" Settings</td></tr>
+  <tr>
+    <td class='kincol sepcol row_title'>Kin</td>
+    <td class='q2col sepcol row_title'>{{ms.rowTitle('Q2',1)}}</td>
+    <td class='sepcol row_title'>E<sub>beam</sub><br />[{{info.unit['beam_e']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>bb</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>&theta;<sub>sbs</sub><br />[{{info.unit['det_angle']}}]</td>
+    <td class='sepcol row_title'>d<sub>bb</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>mag</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>d<sub>hcal</sub><br />[{{info.unit['det_distance']}}]</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('bdl',1)}}</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('scat_e_p',1)}}</td>
+    <td class='sepcol row_title'>{{ms.rowTitle('scat_h_p',1)}}</td>
+  </tr>
+  {% for k in configsetsgolden %}
+  <tr {% if loop.index == 1 %} class="first_set_item" {% endif %}>
+    {% if loop.index == 1 %}
+    {% endif %}
+    <td class="kincol sepcol"><pre>{{k['kin']}}</pre></td>
+    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+
+    {% for v in ('beam_e','theta_bb', 'theta_sbs', 'dist_bb', 'dist_mag', 'dist_hcal') %}
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k[v]}}</pre></td>
+    {% endfor %}
+    <td class='sepcol configvalcol'><pre>{{ms.printBdl(k['bdl'])}}</pre></td>
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_e_p']}}</pre></td>
+    <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_h_p']}}</pre></td>
+  </tr>
+  {% endfor %}
+</table>
+{{ms.printFootnotes()}}
+
+{% endblock body %}
