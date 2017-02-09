@@ -1,0 +1,42 @@
+{% extends "templates/gmnAcceptance/Base.html" %}
+
+{% macro printCompare(k,v,f) -%}
+<td><pre>{{ms.printV(k['Proposal'+v],f)}}</pre></td>
+<td><pre>{{ms.printV(k['Simulation'+v],f)}}</pre></td>
+<td class='sepcol'><pre>{{ms.printV(k['PDiff'+v],'pdiff')}}</pre></td>
+{% endmacro %}
+
+
+{% set active_page = 'goldensummary' -%}
+{% block ActivePage %}
+{% endblock ActivePage %}
+
+{% block title %}Compare to Proposal{% endblock title %}
+
+{% block body %}
+<table class="hcal_set_table">
+  <tr class="row_title"><td colspan=42 class='hcal_set_title'>Quick Comparison to Proposal</td></tr>
+  <tr>
+    <td class='kincol sepcol row_title' rowspan=2>Kin</td>
+    <td class='q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
+    <td colspan=3 class='sepcol row_title'>Expected Number of Neutrons</td>
+  </tr>
+  <tr class="row_subtitle">
+    <td>Proposal</td>
+    <td>Simulation</td>
+    <td class="sepcol">%diff</td>
+    <!--
+    <td>Proton</td>
+    <td class='sepcol'>Neutron</td>
+    -->
+  </tr>
+  {% for k in compare %}
+  <tr {% if loop.index > 1 %} class="first_set_item" {% endif %}>
+    <td class='kincol sepcol'>{{ k['kin'] }}</td>
+    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+    {{printCompare(k,'CountsNeutron','num_events10')}}
+  </tr>
+  {% endfor %}
+</table>{{ms.printFootnotes()}}
+
+{% endblock %}

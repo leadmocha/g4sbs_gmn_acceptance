@@ -4,7 +4,8 @@ class StdGMnInfo:
     self.unit =  {}
     self.title = {}
     self.definition = {}
-    self.maxBdl = 1e6 # To be set by user, default is ridiculous
+    self.maxBdl = 1.71 # This number comes from Robin
+    self.displayMaxEX = 2 ## Maximum number of Exclusion zones to display
 
   ## Add a new definition
   def add(self,var,title='',unit='',definition='',footnote=''):
@@ -14,7 +15,7 @@ class StdGMnInfo:
 
 ## Define the units
 info = StdGMnInfo()
-info.unit['sigma'] = 'pb'
+info.unit['sigma'] = 'fb'
 info.unit['thetapq_radius'] = 'cm'
 info.unit['solid'] = 'msr'
 info.unit['voff'] = 'cm'
@@ -39,7 +40,7 @@ info.add('thetapq_radius','&theta;<sub>pq</sub> Cut Radius','cm','')
 info.add('dmz','DMZ','cm','Starting from the lowest (highest) hcal position where the Proton (Neutron) is positively identified, the DMZ represents a line above (below) this point where no particle is identified.')
 info.add('posID','Positive-ID','','A particle is positively identified if it satisfies the &theta;<sub>pq</sub> cut.')
 info.add('negID','Negative-ID','','A particle is negatively identified (misidentified) if it satisfies the &theta;<sub>pq</sub> cut of the <b>other</b> hadron.')
-info.add('sigma','Cross Section &int;&sigma;d&Omega;','pb','The corresponding cross section of the hadron integrated over the acceptance and weighted by the efficiency.')
+info.add('sigma','Cross Section &int;&sigma;d&Omega;','fb','The corresponding cross section of the hadron integrated over the acceptance and weighted by the efficiency.')
 info.add('IDPerTotal','%-of no cut Sigma','','The ratio of the Cross section of the Proton (Neutron) scaled by the total cross section of the Neutron (Proton) with no &theta;<sub>pq</sub> cut.')
 info.add('IDPerOtherPosID','%-of Other &sigma;','','The ratio of the cross section of the Proton (Neutron) scaled by the cross section of the Neutron (Proton) that satisfied the &theta;<sub>pq</sub> cut.')
 info.add('IDPerFirst','%-Diff of First Row','','Percent Difference of this value compared to first row in the given table.')
@@ -50,10 +51,20 @@ info.add('pdiff_ratio_overestimate','%-Diff','','')
 info.add('ratio_eff_posID','R<sub></sub>','','')
 info.add('ratio_eff_measured','R<sub>meas</sub>','','')
 info.add('pdiff_ratio_eff_overestimate','%-Diff','','')
-info.add('Luminosity','Luminosity',u'x10\u00B3\u2078/cm\u00B2s','','Taken from the proposal')
+#info.add('Luminosity','Luminosity',u'x10\u00B3\u2078/A/cm\u00B2/s','','Taken from the proposal')
+info.add('Luminosity','Luminosity','/fb/hr','','Taken from the proposal')
 info.add('RunningTime','Running Time','hr','','Taken from the proposal')
 info.add('InelPContam','Inelastic Proton Contamination (bkg/total)','%','','Taken from the proposal')
 info.add('InelNContam','Inelastic Neutron Contamination (bkg/total)','%','','Taken from the proposal')
 info.add('scat_e_p','P<sub>e\'</sub>','GeV/c','','')
 info.add('scat_h_p','P<sub>h\'</sub>','GeV/c','','')
-info.add('stat_error','Estimated Statistical Error','',u'Statistical errors for &sigma;<sub>n,p</sub> are estimated by &delta;&sigma;<sub>h</sub>\u22481/\u221AN<sub>h</sub>, where N<sub>h</sub> = &sigma;<sub>h</sub>&int;Ldt, L is the Luminosity and t is the running time in seconds. The statistical error for R is then taken as &delta;R = \u221A( &delta;&sigma;<sub>n</sub>\u00B2 +  &delta;&sigma;<sub>p</sub>\u00B2 ).','')
+info.add('stat_error','Stats (&Delta;R/R)','',u'Statistical errors for &sigma;<sub>n,p</sub> are estimated by &delta;&sigma;<sub>h</sub>\u22481/\u221AN<sub>h</sub>, where N<sub>h</sub> = &sigma;<sub>h</sub>&int;Ldt, L is the Luminosity and t is the running time in seconds. The statistical error for R is then taken as &delta;R = \u221A( &delta;&sigma;<sub>n</sub>\u00B2 +  &delta;&sigma;<sub>p</sub>\u00B2 ).','')
+
+
+info.add('SigmaPCoin','p-coinc. &int;&sigma;d&Omega;','fb','','Taken from the proposal')
+info.add('SigmaNCoin','n-coinc. &int;&sigma;d&Omega;','fb','','Taken from the proposal')
+info.add('counts_neutron','Expected Neutron Counts','','','')
+info.add('counts_proton','Expected Proton Counts','','','')
+info.add('rate_neutron','Expected Neutron Counts','','','')
+info.add('rate_proton','Expected Proton Counts','','','')
+info.add('rate_hadron','Expected Counts','/hr','','')

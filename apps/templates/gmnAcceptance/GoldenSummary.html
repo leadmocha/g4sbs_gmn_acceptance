@@ -11,7 +11,7 @@
   <tr class="row_title"><td colspan=42 class='hcal_set_title'>Quick Summary of Golden Runs</td></tr>
   <tr>
     <td class='kincol sepcol row_title' rowspan=2>Kin</td>
-    <td class='q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
+    <td class='conf_q2col sepcol row_title'rowspan=2>{{ms.rowTitle('Q2',0)}}</td>
     <td class='configandsetcol sepcol row_title'rowspan=2>Config/Set</td>
     <td colspan=2 class='sepcol row_title'>Cross Section &int;&sigma;d&Omega;<br />[{{ info.unit['sigma'] }}]</td>
     <td rowspan=2 class='sepcol row_title extended_cell'>Solid Angle &int;d&Omega;<br />[{{ info.unit['solid'] }}]</td>
@@ -31,13 +31,13 @@
   {% for k in goldens %}
   <tr {% if loop.index > 1 %} class="first_set_item" {% endif %}>
     <td class='kincol sepcol'>{{ k['kin'] }}</td>
-    <td class='q2col sepcol'>{{ k['Q2'] }}</td>
+    <td class='conf_q2col sepcol'>{{ k['Q2'] }}</td>
     <td class='configandsetcol sepcol'>{{ms.printSetConfigLink(k)}}</td>
 
     <td><pre>{{ms.printSigma(k['values']['total_sigma_proton'])}}</pre></td>
     <td class='sepcol'><pre>{{ms.printSigma(k['values']['total_sigma_neutron'])}}</pre></td>
     <td class='sepcol'><pre>{{ms.printV(k['values']['total_solid_proton'])}}</pre></td>
-    <td class='q2col sepcol'><pre>{{ms.printV(k['values']['thetapq'],'angle')}}</pre></td>
+    <td class='sepcol'><pre>{{ms.printV(k['values']['thetapq'],'angle')}}</pre></td>
     <td class='sepcol'><pre>{{ms.printV(k['values']['thetapq_radius'])}}</pre></td>
     <td class='sepcol'><pre>{{ms.printV(k['values']['pn_vertical_sep'])}}</pre></td>
     <td class='sepcol comment_cell'>{{ k['comment'] }}</td>

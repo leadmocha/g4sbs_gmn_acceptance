@@ -76,7 +76,11 @@ td.kincol {
   width: 30px;
 }
 
-td.q2col {
+.kin_q2col {
+  display: none;
+}
+
+td.conf_q2col td.kin_q2col td.gold_q2col td.q2col {
   width: 60px;
 }
 
@@ -108,8 +112,13 @@ tr.first_set_item, tr.seprow {
   border-top: 1px solid lightgray;
 }
 
-tr.row_title, tr.row_subtitle {
+tr.row_title, tr.row_subtitle{
   border-bottom: 1px solid;
+}
+
+tr.row_title_separator {
+  border-bottom: 1px solid;
+  border-top: 1px solid;
 }
 
 td.proposal_col_title {
@@ -142,12 +151,19 @@ td.col_unit {
 }
 
 
-.row_subtitle {
+.row_subtitle, .row_title_separator {
   font-family: inherit !important;
   font-weight: bold;
   background-color: #F9F9F9;
   font-size: 90%;
 }
+
+.row_title_separator {
+  background-color: none;
+  text-align: left !important;
+}
+
+
 
 .effect_good {
   color: ForestGreen;

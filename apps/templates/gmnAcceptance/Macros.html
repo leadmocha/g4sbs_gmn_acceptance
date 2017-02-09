@@ -7,8 +7,11 @@
 {%- endmacro %}
 
 
+{## Since sigma units now in fm, we can change this:
 {% macro printSigma(v) -%}{{'%9.6f'%v}}{%- endmacro%}
-{% macro printExSigma(v) -%}{{'%9.6f'%v}}{%- endmacro%}
+##}
+{% macro printSigma(v) -%}{{'%9.3f'%v}}{%- endmacro%}
+{% macro printExSigma(v) -%}{{'%9.3f'%v}}{%- endmacro%}
 
 
 {# Macros to print out specific value given the name/type #}
@@ -17,11 +20,16 @@
 {%- elif t == 'angle' -%}{{'%4.1f&deg;'%v}}
 {%- elif t == 'pdiff' -%}{%- if v == 0 -%}&nbsp;-----&nbsp;{%- else -%}{{'%+6.2f%%'%v}}{%- endif -%}
 {%- elif t == 'pdiffn' -%}{%- if v == 0 -%}&nbsp;----&nbsp;{%- else -%}{{'%+6.2f'%v}}{%- endif -%}
+{## Since sigma unit now in fm, we can change this:
 {%- elif t == 'sigmaID' -%}{{'%11.8f'%v}}
+##}
+{%- elif t == 'sigmaID' -%}{{'%11.5f'%v}}
 {%- elif t == 'dmz' -%}{{'%4.1f'%v}}
 {%- elif t == 'percent' -%}{{'%5.2f%%'%v}}
 {%- elif t == 'ratio' -%}{{'%5.2f'%v}}
 {%- elif t == 'gmn_ratio' -%}{{'%6.4f'%v}}
+{%- elif t == 'num_events' -%}{{'%d'%v}}
+{%- elif t == 'num_events10' -%}{{'%10d'%v}}
 {%- else -%}{{'%8.5f'%v}}
 {%- endif -%}
 {%- endmacro -%}
