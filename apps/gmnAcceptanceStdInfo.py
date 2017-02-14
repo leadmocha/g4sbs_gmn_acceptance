@@ -42,7 +42,12 @@ info.add('posID','Positive-ID','','A particle is positively identified if it sat
 info.add('negID','Negative-ID','','A particle is negatively identified (misidentified) if it satisfies the &theta;<sub>pq</sub> cut of the <b>other</b> hadron.')
 info.add('sigma','Cross Section &int;&sigma;d&Omega;','fb','The corresponding cross section of the hadron integrated over the acceptance and weighted by the efficiency.')
 info.add('IDPerTotal','%-of no cut Sigma','','The ratio of the Cross section of the Proton (Neutron) scaled by the total cross section of the Neutron (Proton) with no &theta;<sub>pq</sub> cut.')
-info.add('IDPerOtherPosID','%-of Other &sigma;','','The ratio of the cross section of the Proton (Neutron) scaled by the cross section of the Neutron (Proton) that satisfied the &theta;<sub>pq</sub> cut.')
+info.add('IDPerOtherPosID','%-of Other &sigma;','','''
+The ratio of the cross section of the Proton (Neutron) scaled by the cross
+section of the Neutron (Proton) that satisfied the &theta;<sub>pq</sub> cut.
+Where the Proton (Neutron) column represents the total number of Neutrons
+that <b>were in fact</b> Protons (Neutrons).
+''')
 info.add('IDPerFirst','%-Diff of First Row','','Percent Difference of this value compared to first row in the given table.')
 #info.add('ratio_posID','&sigma;<sub>n</sub>/&sigma;<sub>p</sub>','','Percent difference of the ')
 info.add('ratio_posID','R<sub></sub>','','')
@@ -53,7 +58,9 @@ info.add('ratio_eff_measured','R<sub>meas</sub>','','')
 info.add('pdiff_ratio_eff_overestimate','%-Diff','','')
 #info.add('Luminosity','Luminosity',u'x10\u00B3\u2078/A/cm\u00B2/s','','Taken from the proposal')
 info.add('Luminosity','Luminosity','/fb/hr','','Taken from the proposal')
-info.add('RunningTime','Running Time','hr','','Taken from the proposal')
+info.add('RunningTime','Running Time (Full Lumi)','hr','','Taken from the proposal')
+info.add('RunningTimeLHalf','Running Time (0.5*Lumi)','hr','','Taken from the proposal')
+info.add('RunningTimeL10Per','Running Time (0.1*Lumi)','hr','','Taken from the proposal')
 info.add('InelPContam','Inelastic Proton Contamination (bkg/total)','%','','Taken from the proposal')
 info.add('InelNContam','Inelastic Neutron Contamination (bkg/total)','%','','Taken from the proposal')
 info.add('scat_e_p','P<sub>e\'</sub>','GeV/c','','')
@@ -68,3 +75,4 @@ info.add('counts_proton','Expected Proton Counts','','','')
 info.add('rate_neutron','Expected Neutron Counts','','','')
 info.add('rate_proton','Expected Proton Counts','','','')
 info.add('rate_hadron','Expected Counts','/hr','','')
+info.add('CountsNeutron','Expected Total Neutron','','','')

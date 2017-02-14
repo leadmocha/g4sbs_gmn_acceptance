@@ -18,8 +18,8 @@
 {%- macro printV(v,t) -%}
 {%- if   t == 'sigma' -%}{{printSigma(v)}}
 {%- elif t == 'angle' -%}{{'%4.1f&deg;'%v}}
-{%- elif t == 'pdiff' -%}{%- if v == 0 -%}&nbsp;-----&nbsp;{%- else -%}{{'%+6.2f%%'%v}}{%- endif -%}
-{%- elif t == 'pdiffn' -%}{%- if v == 0 -%}&nbsp;----&nbsp;{%- else -%}{{'%+6.2f'%v}}{%- endif -%}
+{%- elif t == 'pdiff' -%}{%- if v == 0 -%}&nbsp;------&nbsp;{%- else -%}{{'%+7.2f%%'%v}}{%- endif -%}
+{%- elif t == 'pdiffn' -%}{%- if v == 0 -%}&nbsp;------&nbsp;{%- else -%}{{'%+7.2f'%v}}{%- endif -%}
 {## Since sigma unit now in fm, we can change this:
 {%- elif t == 'sigmaID' -%}{{'%11.8f'%v}}
 ##}

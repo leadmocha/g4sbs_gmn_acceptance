@@ -366,10 +366,15 @@ def main():
       result['set'] = k.setID
       currentConfig = ConfigSet(k.kin,k.config,k.setID,k.Q2,k.gen_config,
               k.golden)
-      result['values'] = processValues(k.hcal_set[hcal_voff].values,golden['values'])
+      ## Set the hcal vertical offset desired (the same for all except for
+      ## proposal numbers which are forced to be at 0)
+      hvoff = hcal_voff
+      if k.config.startswith('proposal'):
+        hvoff = 0
+      result['values'] = processValues(k.hcal_set[hvoff].values,golden['values'])
       result_ex = ExResults()
       result['exclusions'] = buildExData(
-          k.hcal_set[hcal_voff].exclusions,result['values'],golden_ex)
+          k.hcal_set[hvoff].exclusions,result['values'],golden_ex)
       configsets['%s/%s'%(k.config,k.setID)].append(currentConfig)
       ## Finally, store the results
       if k.config.startswith('proposal'):
