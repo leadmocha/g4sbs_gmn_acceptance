@@ -9,6 +9,7 @@ results/*
 !/results/db/
 /results/db/old*
 /results/db/web
+/results/db/web_old
 /rootfiles
 /tst.tst
 /tst_batch/
