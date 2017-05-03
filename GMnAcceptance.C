@@ -1,6 +1,11 @@
 #include "GMnAcceptance.h"
 #include "GMnColors.h"
 #include <fstream>
+#include <TMath.h>
+#include <TBox.h>
+#include <TPaveStats.h>
+
+#include <iostream>
 
 #define FILL_NORM 1.0
 // Integrated cross sections in terms of nano-barns now
@@ -210,6 +215,8 @@ void GMnAcceptance::Init()
     // Position histograms
     fhHArmPositions[i] = MakeHCalPositionHisto("","fhHArmPositions",i);
     fhHArmPositionsWeighted[i] = MakeHCalPositionHisto("","fhHArmPositionsWeighted",i);
+    fhHArmPositionsWithTrig[i] = MakeHCalPositionHisto("","fhHArmPositionsWithTrig",i);
+    fhHArmPositionsWeightedWithTrig[i] = MakeHCalPositionHisto("","fhHArmPositionsWeightedWithTrig",i);
     fhHArmPositionsInAcceptance[i] = MakeHCalPositionHisto("in Acceptance",
         "fhHArmPositionsInAcceptance",i);
     fhHArmPositionsInAcceptanceWeighted[i] = MakeHCalPositionHisto("in Acceptance",
@@ -337,6 +344,8 @@ void GMnAcceptance::Init()
   fCanvasAnglesRatio = MakeCanvas("fCanvasAnglesRatio",4,1);
   fCanvasPositions = MakeCanvas("fCanvasPositions",3,2);
   fCanvasPositionsWeighted = MakeCanvas("fCanvasPositionsWeighted",2,1);
+  fCanvasPositionsWithTrig = MakeCanvas("fCanvasPositionsWithTrig",2,1);
+  fCanvasPositionsWeightedWithTrig = MakeCanvas("fCanvasPositionsWeightedWithTrig",2,1);
   fCanvasPositionsInAcceptance = MakeCanvas("fCanvasPositionsInAcceptance",3,1);
   fCanvasPositionsInAcceptanceWeighted = MakeCanvas("fCanvasPositionsInAcceptanceWeighted",2,1);
   //fCanvasAcceptance = MakeCanvas("fCanvasAcceptance",1,1,2.);
@@ -473,10 +482,20 @@ void GMnAcceptance::ProcessFirstPassEntry(int entry, GMnStatus_t status,
   if(fData.n_det) {
     fhHArmPositions[0]->Fill(fData.nvars.x,fData.nvars.y,FILL_NORM);
     fhHArmPositionsWeighted[0]->Fill(fData.nvars.x,fData.nvars.y,fData.ev.nsigma*SIGMA_UNIT);
+    // Positions in coincidence (triggered) with electron detector
+    if(fData.e_det) {
+      fhHArmPositionsWithTrig[0]->Fill(fData.nvars.x,fData.nvars.y,FILL_NORM);
+      fhHArmPositionsWeightedWithTrig[0]->Fill(fData.nvars.x,fData.nvars.y,fData.ev.nsigma*SIGMA_UNIT);
+    }
   }
   if(fData.p_det) {
     fhHArmPositions[1]->Fill(fData.pvars.x,fData.pvars.y,FILL_NORM);
     fhHArmPositionsWeighted[1]->Fill(fData.pvars.x,fData.pvars.y,fData.ev.psigma*SIGMA_UNIT);
+    // Positions in coincidence (triggered) with electron detector
+    if(fData.e_det) {
+      fhHArmPositionsWithTrig[1]->Fill(fData.pvars.x,fData.pvars.y,FILL_NORM);
+      fhHArmPositionsWeightedWithTrig[1]->Fill(fData.pvars.x,fData.pvars.y,fData.ev.psigma*SIGMA_UNIT);
+    }
   }
 
   if(fData.e_det&&fData.n_det&&fData.p_det) {
@@ -1034,6 +1053,10 @@ void GMnAcceptance::FinalizeFirstPass()
   SaveCanvas(fCanvasPositions,"positions");
   DrawPositionsWeighted(fCanvasPositionsWeighted);
   SaveCanvas(fCanvasPositionsWeighted,"positions_weighted");
+  DrawPositionsWithTrig(fCanvasPositionsWithTrig,
+      fCanvasPositionsWeightedWithTrig);
+  SaveCanvas(fCanvasPositionsWithTrig,"positions_with_trig");
+  SaveCanvas(fCanvasPositionsWeightedWithTrig,"positions_weighted_with_trig");
   gGMnColors->SelectPaletteDiverging();
 
   // Draw position differences
@@ -1201,6 +1224,28 @@ void GMnAcceptance::DrawPositionsWeighted(TCanvas *canvas)
   fhHArmPositionsWeighted[1]->Draw(kHist2DDrawOption);
   DrawHCalBox();
 }
+
+void GMnAcceptance::DrawPositionsWithTrig(TCanvas *c, TCanvas *cTrig)
+{
+  c->cd(1);
+  gPad->SetGrid(kTRUE,kTRUE);
+  fhHArmPositionsWithTrig[0]->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+  c->cd(2);
+  gPad->SetGrid(kTRUE,kTRUE);
+  fhHArmPositionsWithTrig[1]->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+
+  cTrig->cd(1);
+  gPad->SetGrid(kTRUE,kTRUE);
+  fhHArmPositionsWeightedWithTrig[0]->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+  cTrig->cd(2);
+  gPad->SetGrid(kTRUE,kTRUE);
+  fhHArmPositionsWeightedWithTrig[1]->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+}
+
 
 void GMnAcceptance::DrawPositionsInAcceptance(TCanvas *canvas)
 {

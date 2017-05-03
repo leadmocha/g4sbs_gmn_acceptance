@@ -43,6 +43,8 @@ private:
   TCanvas *fCanvasAnglesRatio;
   TCanvas *fCanvasPositions;
   TCanvas *fCanvasPositionsWeighted;
+  TCanvas *fCanvasPositionsWithTrig;
+  TCanvas *fCanvasPositionsWeightedWithTrig;
   TCanvas *fCanvasPositionsInAcceptance;
   TCanvas *fCanvasPositionsInAcceptanceWeighted;
   //TCanvas *fCanvasAcceptance;
@@ -85,6 +87,7 @@ private:
   void FixStatBox(TH1F* hist, TVirtualPad *pad = 0);
   void DrawPositions(TCanvas *canvas);
   void DrawPositionsWeighted(TCanvas *canvas);
+  void DrawPositionsWithTrig(TCanvas *canvasPos, TCanvas *canvasPosWeighted);
   void DrawPositionsInAcceptance(TCanvas *canvas);
   void DrawPositionsInAcceptanceWeighted(TCanvas *canvas);
   void DrawHCalBox();
@@ -161,6 +164,8 @@ private:
   TH2F *fhHArmPositions[2];
   TH2F *fhHArmPositionsInAcceptance[2];
   TH2F *fhHArmPositionsWeighted[2];
+  TH2F *fhHArmPositionsWithTrig[2];
+  TH2F *fhHArmPositionsWeightedWithTrig[2];
   TH2F *fhHArmPositionsInAcceptanceWeighted[2];
   TH2F *fhEArmPositions;
   TH2F *fhEArmPositionsInAcceptance;
