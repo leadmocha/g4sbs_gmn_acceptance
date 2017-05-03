@@ -3,10 +3,13 @@
 #include "GMnAcceptance.h"
 #include "GMnColors.h"
 
+// Set the number of vertical offsets to check
 //const int kNumVOffs = 4;
 //const double kVOffs[kNumVOffs] = { 0, 15, 30, 45};
-const int kNumVOffs = 4;
-const double kVOffs[kNumVOffs] = { 0, 15, 30, 45 };
+// As of Jan 2017 it has become obvious that 45 cm will be the minimum
+// offset. So to speed up the analysis, I only consider this one
+const int kNumVOffs = 1;
+const double kVOffs[kNumVOffs] = { 45 };
 
 const bool kQuickPlot = false;
 const double kQuickPlotPercent = 0.03;
