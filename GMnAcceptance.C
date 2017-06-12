@@ -1106,6 +1106,8 @@ void GMnAcceptance::FinalizeSecondPass()
   gPad->SetGrid(kTRUE,kTRUE);
   fhAnglesSigmaP->Draw(kHist2DDrawOption);
   SaveCanvas(fCanvasAnglesAcceptance,"acceptance");
+  SaveCanvas(fCanvasAnglesAcceptance,"acceptance","C");
+  SaveAcceptanceMap("acceptance_map");
 
   fCanvasAnglesNPEfficiency->cd(0);
   gPad->SetGrid(kTRUE,kTRUE);
@@ -1198,6 +1200,36 @@ void GMnAcceptance::SaveCanvas(TCanvas *canvas, const char *comment,
 
   // Return verbosity to previous level
   gErrorIgnoreLevel = level;
+}
+
+void GMnAcceptance::SaveAcceptanceMap(TString filename)
+{
+  // Get the path
+  TString path = GetSavePath(false);
+
+  fstream outMap;
+  outMap.open(TString::Format("%s/gmn_kin%02d_v%g_%s.txt",
+        path.Data(),fKin,fVOff,filename.Data()),std::ios::out);
+
+  Int_t nbx = fhAnglesMap->GetNbinsX();
+  Int_t nby = fhAnglesMap->GetNbinsY();
+  Int_t b;
+  // Write the map file header BinsX, MinX, MaxX, BinsY, MinY, MaxY \n entries
+  outMap << nbx << " " << fhAnglesMap->GetXaxis()->GetBinLowEdge(1)
+    << " " << fhAnglesMap->GetXaxis()->GetBinLowEdge(nbx+1)
+    << " "  << nby << " " << fhAnglesMap->GetYaxis()->GetBinLowEdge(1)
+    << " " << fhAnglesMap->GetYaxis()->GetBinLowEdge(nby+1) << std::endl;
+  outMap << fhAnglesMap->GetEntries() << std::endl;
+
+  for(Int_t bx = 1; bx <= nbx; bx++) {
+    for(Int_t by = 1; by <= nby; by++) {
+      b = fhAnglesMap->GetBin(bx,by);
+      if(fhAnglesMap->GetBinContent(b) == 1) {
+        outMap << b << std::endl;
+      }
+    }
+  }
+  outMap.close();
 }
 
 void GMnAcceptance::DrawPositionsInAcceptanceWeighted(TCanvas *canvas)

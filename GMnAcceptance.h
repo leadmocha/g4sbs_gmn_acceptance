@@ -96,6 +96,7 @@ private:
   void DrawAnglesRatio(TCanvas *canvas);
   void DrawAnglesDetected(TCanvas *canvas);
   bool InsideThetaPQ(double ox, double oy, double vx, double vy);
+  void SaveAcceptanceMap(TString filename);
 
 // Histograms:
 private:
