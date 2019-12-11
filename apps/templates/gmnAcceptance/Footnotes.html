@@ -1,6 +1,6 @@
 {%- if macs.footnotes|length -%}
 <div class="footnotes">
-{%- for symbol,note in macs.footnotes.iteritems() %}
+{%- for symbol,note in macs.footnotes.items() %}
 {%- if loop.index > 1 -%}<br />{%- endif %}
 <sup>{{symbol}}</sup>{{note}}
 {%- endfor -%}

@@ -66,7 +66,7 @@ def main():
     hcal_sets.append(hcal_set);
   out = file('results/db/web/fieldClampStudy.html','w')
   out.write(template.render(hcal_sets=hcal_sets).encode('utf-8'))
-  print 'Done'
+  print('Done')
 
   #db.printDebug()
 

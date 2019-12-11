@@ -15,7 +15,7 @@ class GMnDB:
       config = fileName[:ind];
       kin = int(fileName[ind+4:ind+6]);
       setID = int(fileName[ind+7:]);
-      #print "Config: %s, Kin: %02d, Set: %03d" % (config, kin, setID);
+      #print("Config: %s, Kin: %02d, Set: %03d" % (config, kin, setID))
       data = GMnKin(kin,config,setID)
       data.readData(csvFile)
       name = '%s_k%d_s%d'%(config,kin,setID)
@@ -33,10 +33,10 @@ class GMnDB:
       #kins.append(self.allKins[kin]
 
   def printDebug(self):
-    print "Golden Kinematics Debug: "
-    print self.golden
-    print "Other Kineamtics Debug: "
-    print self.allKins
+    print("Golden Kinematics Debug: ")
+    print(self.golden)
+    print("Other Kineamtics Debug: ")
+    print(self.allKins)
 
   def getConfigSet(self,config,setID):
     result = {}

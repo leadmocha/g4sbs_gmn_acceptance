@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## Highlight any changes in PerFirst row of greater than this value
 PerFirst_EffectThr = 0.5
@@ -6,6 +6,8 @@ PerFirst_EffectThr = 0.5
 Golden_EffectThr = 0.5
 ## Highlight those percent of misidentified values that are bad
 PerTotal_EffectThr = 0.99
+
+www_path='results/db/web'
 
 import math;
 
@@ -287,12 +289,12 @@ class ConfigSet:
     return self.vals[key]
 
   ## Comparator for sorting purposes
-  def __cmp__(self,other):
+  def __lt__(self,other):
     if self['kin'] != other['kin']:
-      return self['kin'] - other['kin']
+      return self['kin'] < other['kin']
     elif self['config'] == other['config']:
-      return self['set'] - other['set']
-    return self['config'] > other['config']
+      return self['set'] < other['set']
+    return self['config'] < other['config']
 
 class CompareProposal:
   def __init__(self,results,kin):
@@ -385,39 +387,42 @@ def main():
         results['others'].append(result)
 
     ## Get the Particle ID info for this kinematic
-    outKinSummary = file ('results/db/web/gmnAcceptance_Kin%02d_Summary.html' %
-        (tmp.kin),'w')
+    outKinSummary = open(www_path+'/gmnAcceptance_Kin%02d_Summary.html' %
+        (tmp.kin),'w',encoding='utf-8')
     outKinSummary.write(template_KinSummary.render(stdErrVal=stdErrVal,
       golden=golden,info=info,results=results,proposal=GMnProposalInfo
-      ).encode('utf-8'))
+      ))
 
-  #out = file('results/db/web/gmnAcceptance.html','w')
-  outGoldenSummary = file ('results/db/web/gmnAcceptance_GoldenSummary.html','w')
+  #out = open(www_path+'/gmnAcceptance.html','w')
+  outGoldenSummary = open(www_path+'/gmnAcceptance_GoldenSummary.html','w',
+          encoding='utf-8')
   outGoldenSummary.write(template_GoldenSummary.render(
-    goldens=goldens,configsetsgolden=configsetsgolden,info=info).encode('utf-8'))
+    goldens=goldens,configsetsgolden=configsetsgolden,info=info))
 
   for i in configsets:
     configsets[i].sort()
   #configsets.sort()
-  outConfigSetSummary = file ('results/db/web/gmnAcceptance_ConfigSetSummary.html','w')
+  outConfigSetSummary = open(www_path+'/gmnAcceptance_ConfigSetSummary.html',
+          'w',encoding='utf-8')
   outConfigSetSummary.write(template_ConfigSetSummary.render(
-    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal).encode('utf-8'))
+    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
 
   ## Proposal numbers
-  outProposal = file ('results/db/web/gmnAcceptance_Proposal.html','w')
+  outProposal = open(www_path+'/gmnAcceptance_Proposal.html','w',
+          encoding='utf-8')
   #outProposal.write(template_Proposal.render(
-  #  configsets=configsets,info=info,proposal=GMnProposalInfo).encode('utf-8'))
+  #  configsets=configsets,info=info,proposal=GMnProposalInfo))
 
   ## Test only (compare to proposal)
-  outCompare = file ('results/db/web/gmnAcceptance_Compare.html','w')
+  outCompare = open(www_path+'/gmnAcceptance_Compare.html','w',encoding='utf-8')
   outCompare.write(template_Compare.render(
-    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal).encode('utf-8'))
+    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
   ## Copy the style sheet over too
-  outStyle = file('results/db/web/gmnAcceptance_style.css','w')
-  outStyle.write(template_Styles.render(info=info).encode('utf-8'))
+  outStyle = open(www_path+'/gmnAcceptance_style.css','w',encoding='utf-8')
+  outStyle.write(template_Styles.render(info=info))
 
   ## Done!!
-  print "Done!"
+  print("Done!")
 
   #db.printDebug()
 

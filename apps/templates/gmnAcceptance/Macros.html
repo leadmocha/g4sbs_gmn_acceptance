@@ -42,7 +42,7 @@
 {% macro printFootnotes(what=0) -%}
 {# {%- if footnotes|length -%} #}
 <div class="footnotes">
-{%- for symbol,note in footnotes.iteritems() %}
+{%- for symbol,note in footnotes.items() %}
 {%- if loop.index > 1 -%}<br />{%- endif %}
 <sup>{{symbol}}</sup>{{note}}
 {%- endfor -%}

@@ -44,7 +44,7 @@ class HCalEfficiencyTable:
       ## Finally, split on comma
       items = line.rsplit(',')
       if len(items) != 2:
-        print "Skipping bad efficiency line"
+        print("Skipping bad efficiency line")
         continue
       momenta.append(float(items[0]))
       effs.append(float(items[1])/100.)
@@ -105,8 +105,8 @@ def readGMnProposal(filename='kinematics/proposal_info.txt'):
     items = line.rsplit()
     ## Ensure there are exactly 8 items
     if len(items) != 8:
-      print "Skipping bad proposal line, with only %d entries: %s" %(
-          len(items),line)
+      print("Skipping bad proposal line, with only %d entries: %s" %(
+          len(items),line))
       continue
 
     ## Alright, we can proceed. Add this new line to the dictionary
@@ -117,8 +117,11 @@ def readGMnProposal(filename='kinematics/proposal_info.txt'):
   ## Now that we have read the proposal fix some units
   ## Convert proposal luminosity given in x10^-38/A/cm^2/s to /fb/hr
   for kin in range(1,8):
-    GMnProposalInfo['Luminosity'][kin] = LuminosityToFbHr * \
-        float(GMnProposalInfo['Luminosity'][kin])
+    ## Trying to get rid of an annoying floating point error that happens
+    ## when we do 0.7*1.80.  So multiply by 10 and then divide after the
+    ## operation. Sigh...
+    GMnProposalInfo['Luminosity'][kin] = (10.*LuminosityToFbHr * \
+        float(GMnProposalInfo['Luminosity'][kin]))/10.
   ## and now let's do some calculations of our own
   #GMnProposalInfo['counts_proton_calculated'] = [0,1,2,3,4,5,6,7]
   #GMnProposalInfo['counts_neutron_calculated'] = [0,1,2,3,4,5,6,7]

@@ -64,7 +64,7 @@
 <div class="definitions">
 <h1>Glossary:</h1>
 <ul class="definitions">
-  {% for key,val in ms.defsShown.iteritems()  if info.definition[key] != '' %}
+  {% for key,val in ms.defsShown.items()  if info.definition[key] != '' %}
   <li><b>{{info.title[key]}}:</b> {{info.definition[key]}}</li>
   {% endfor -%}
 </ul>

@@ -2,7 +2,7 @@
 <div class="definitions">
 <h1>Glossary:</h1>
 <ul>
-  {% for key,val in macs.defsShown.iteritems()  if info.definition[key] != '' %}
+  {% for key,val in macs.defsShown.items()  if info.definition[key] != '' %}
   <li><b>{{info.title[key]}}:</b> {{info.definition[key]}}</li>
   {% endfor -%}
 </ul>

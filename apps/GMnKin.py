@@ -47,16 +47,15 @@ class GMnExclusionData:
     self.golden = golden
 
   # Compare ExclusionData for sorting purposes
-  def __cmp__(self,other):
+  def __lt__(self,other):
     if self.golden != other.golden:
       #print("%f - %f = %f  (s.w=%f, o.w=%f)"%(other.golden,self.golden,
       #  other.golden-self.golden,self.width,other.width))
-      return 10*(other.golden - self.golden)
+      return self.golden < other.golden
     else:
-      r = (self.width - other.width)/abs(self.width-other.width)
-      #print"%f - %f = %f (r=%f)"%(self.width,other.width,self.width-other.width,
-      #  r)
-      return r
+      return self.width < other.width
+      #print("%f - %f = %f (r=%f)"%(self.width,other.width,self.width-other.width,
+      #  r))
 
   ## Print debug info
   def __repr__(self):
@@ -88,15 +87,15 @@ class GMnKin:
     return result
 
   ## Compare Kin sets for sorting purposes
-  def __cmp__(self,other):
+  def __lt__(self,other):
     ## Sort by kin, config, setID
     if self.kin == other.kin:
       if self.config == other.config:
-        return self.setID - other.setID
+        return self.setID < other.setID
       else:
-        return 2*(self.config.lower() < other.config.lower())-1
+        return self.config.lower() < other.config.lower()
     else:
-      return self.kin - other.kin
+      return self.kin < other.kin
 
 
   def readData(self,csv):

@@ -166,7 +166,7 @@
     <td class='sepcol configvalcol'><pre>{{proposal['Q2'][golden['kin']]}}</pre></td>
   </tr>
 
-  {% for var,kins in proposal.iteritems() %}
+  {% for var,kins in proposal.items() %}
   {% if var != 'Q2' %}
   <tr class="seprow">
     {{ms.colTitle(var,1,'proposal_col_title')}}
