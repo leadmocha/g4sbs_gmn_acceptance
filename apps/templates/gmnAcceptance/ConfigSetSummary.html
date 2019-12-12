@@ -21,6 +21,7 @@
     <td class='sepcol row_title'>{{ms.rowTitle('bdl',1)}}</td>
     <td class='sepcol row_title'>{{ms.rowTitle('scat_e_p',1)}}</td>
     <td class='sepcol row_title'>{{ms.rowTitle('scat_h_p',1)}}</td>
+    <td class='sepcol row_title'>&nbsp;</td>
   </tr>
   {% for cs, kin_list in configsets.items() %}
   {% for k in kin_list %}
@@ -37,6 +38,7 @@
     <td class='sepcol configvalcol'><pre>{{ms.printBdl(k['bdl'])}}</pre></td>
     <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_e_p']}}</pre></td>
     <td class='sepcol configvalcol'><pre>{{'%5.2f'%k['scat_h_p']}}</pre></td>
+    <td class='sepcol configvalcol'><pre>[<a class="configset_link" href="plots_{{k['config']}}_{{k['set']}}_kin0{{k['kin']}}.html">plots</a>]</pre></td>
   </tr>
   {% endfor %}
   {% endfor %}

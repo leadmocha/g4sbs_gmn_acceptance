@@ -1,0 +1,41 @@
+{% extends "templates/gmnAcceptance/Base.html" %}
+
+{% set active_page = 'configsetsummary' -%}
+
+{% block title %}Plots {{'Kin%02d'%kin}} for {{config}}/{{setID}} config {% endblock title %}
+
+{% macro printTypeTitle(t) %}
+{%- if t == 'golden' -%}"Golden" Setting
+{%- elif t == 'proposal' -%}Proposal Setting
+{%- elif t == 'others' -%}Other Settings
+{%- endif -%}
+{%- endmacro -%}
+
+{% macro printIfNotError(val,type='') -%}{% if val != stdErrVal  %}{{ms.printV(val,type)}}{% endif %}{%- endmacro %}
+{% macro printValAndPDiff(r,val,row,useclass='',valType='',rowCount=0) -%}
+<td class="{{useclass}} double_valued_cell" style="white-space: nowrap;"><pre>{{ms.printV(r['values'][val],valType)}}{% if rowCount > 1 %} (<span class="{{ r['values']['class_%s'%val]}}">{{ms.printV(r['values']['pdiff_%s'%val],'pdiff')}}</span>){% else %}          {% endif %}</pre></td>{% endmacro %}
+
+{% macro printRatioInfo(r,val='') -%}
+<td><pre>{{ms.printV(r[val+'posID'],'gmn_ratio')}}</pre></td>
+<td><pre>{{ms.printV(r[val+'measured'],'gmn_ratio')}}</pre></td>
+<td class='sepcol'><pre>{{ms.printV(r['pdiff_'+val+'overestimate'],'pdiff')}}</pre></td>
+{% endmacro %}
+
+
+{% block body scoped %}
+<h1>Plot Summary: Kin {{ '%02d'%kin }} {{config}}/{{setID}}</h1>
+<ul>
+{% for v in (['electron_rates','Electron rates'],['acceptance','Acceptance'], ['angles','Angles'],
+  ['angles_detected','Angles detected'],
+  ['neutron_proton_efficiency','N-P detection differences'],
+  ['positions','N-P positions on HCAL'],
+  ['positions_in_acceptance','N-P positions on HCAL (with Acceptance Cut)'],
+  ['positions_weighted','N-P positions on HCAL (xs-weighted)'],
+  ['positions_weighted_in_acceptance','N-P positions on HCAL (xs-weighted and with acceptance cut)'],
+  ['proton_neutron_position_diffs','N-P position differences on HCAL']
+  ) %}
+  <a href="plots/{{config}}/{{setID}}/kin0{{kin}}/gmn_kin0{{kin}}_v45_{{v[0]}}.png">{{v[1]}}</a><br/>
+    {% endfor %}
+
+</ul>
+{% endblock body %}

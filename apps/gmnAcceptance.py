@@ -26,6 +26,7 @@ template_ConfigSetSummary = j2_env.get_template('templates/gmnAcceptance/ConfigS
 template_Compare = j2_env.get_template('templates/gmnAcceptance/Compare.html')
 template_Proposal = j2_env.get_template('templates/gmnAcceptance/Proposal.html')
 template_KinSummary = j2_env.get_template('templates/gmnAcceptance/KinSummary.html')
+template_PlotSummary = j2_env.get_template('templates/gmnAcceptance/PlotSummary.html')
 template_Styles = j2_env.get_template('templates/gmnAcceptance/styles.css')
 
 stdErrVal = -4e-6
@@ -90,6 +91,18 @@ def processValues(vals,golden={}):
     for v in myvars:
       processPercentDiff(v[0],results,golden,v[1])
   return results
+
+def makePlotSummary(config,setID,kin,info):
+  try:
+    outPlotSummary = open(www_path+'/plots_%s_%d_kin0%d.html'%(
+        config,setID,kin),'w',encoding='utf-8')
+    outPlotSummary.write(template_PlotSummary.render(stdErrVal=stdErrVal,
+        info=info,kin=kin,config=config,setID=setID))
+    outPlotSummary.close()
+  except IOError:
+    print('Skipping missing plots for %s/%d Kin0%d'%(
+        config,setID,kin))
+
 
 
 class ExResults:
@@ -354,6 +367,8 @@ def main():
     results['golden'].append(golden)
     configsets['%s/%s'%(tmp.config,tmp.setID)].append(currentConfig)
     configsetsgolden.append(currentConfig)
+    ## Produce plots file for this configuration
+    makePlotSummary(tmp.config,tmp.setID,tmp.kin,info)
 
     ## Get the other non golden kinematics
     otherKins = db.getNonGoldenByKin(kin)
@@ -385,6 +400,8 @@ def main():
         results['proposal'].append(result)
       else:
         results['others'].append(result)
+      ## Produce plots file for this configuration
+      makePlotSummary(k.config,k.setID,k.kin,info)
 
     ## Get the Particle ID info for this kinematic
     outKinSummary = open(www_path+'/gmnAcceptance_Kin%02d_Summary.html' %
@@ -402,21 +419,25 @@ def main():
   for i in configsets:
     configsets[i].sort()
   #configsets.sort()
+  sorted_list = sorted(configsets)
+  configsets2 = defaultdict(list)
+  for c in sorted_list:
+      configsets2[c] = configsets[c]
   outConfigSetSummary = open(www_path+'/gmnAcceptance_ConfigSetSummary.html',
           'w',encoding='utf-8')
   outConfigSetSummary.write(template_ConfigSetSummary.render(
-    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
+    configsets=configsets2,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
 
   ## Proposal numbers
   outProposal = open(www_path+'/gmnAcceptance_Proposal.html','w',
           encoding='utf-8')
   #outProposal.write(template_Proposal.render(
-  #  configsets=configsets,info=info,proposal=GMnProposalInfo))
+  #  configsets=configsets2,info=info,proposal=GMnProposalInfo))
 
   ## Test only (compare to proposal)
   outCompare = open(www_path+'/gmnAcceptance_Compare.html','w',encoding='utf-8')
   outCompare.write(template_Compare.render(
-    configsets=configsets,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
+    configsets=configsets2,info=info,proposal=GMnProposalInfo,compare=results_compare_proposal))
   ## Copy the style sheet over too
   outStyle = open(www_path+'/gmnAcceptance_style.css','w',encoding='utf-8')
   outStyle.write(template_Styles.render(info=info))
