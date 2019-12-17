@@ -15,8 +15,8 @@ results/*
 /tst_batch/
 map_696A.dat
 /jlab_batch/
-/scripts/
 /cmu_batch/
+/batch/logs
 
 
 ##
