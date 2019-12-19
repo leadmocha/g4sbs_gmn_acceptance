@@ -8,6 +8,7 @@ public:
   GMnColors() {
     MakePaletteSequential();
     MakePaletteDiverging();
+    MakePaletteTemperature();
   }
 
   void SelectPaletteSequential() {
@@ -18,9 +19,39 @@ public:
     MakePaletteDiverging();
   };
 
+  void SelectPaletteTemperature() {
+    gStyle->SetPalette(fNumPaletteTemperatureColors,fPaletteTemperatureColors);
+  }
+
+  int GetNumPaletteTemperatureColors() { return fNumPaletteTemperatureColors; }
+
+  void DrawHistoTemperature(TH2F *h, double min, double max)
+  {
+    SelectPaletteTemperature();
+    int n = fNumPaletteTemperatureColors;
+    double x = min;
+    double dx = (max-min)/double(n);
+    h->SetContour(n);
+    for(int i = 0; i < n; i++) {
+      h->SetContourLevel(i,x);
+      x+=dx;
+    }
+    h->SetMinimum(min);
+    h->SetMaximum(max);
+    h->Draw("COLZ");
+    gPad->Update();
+  }
+
+  void DrawHistoSymmetric(TH2F *h, double range)
+  {
+    DrawHistoTemperature(h,-range,range);
+  }
+
 private:
   int fNumPaletteSequentialColors;
   int *fPaletteSequentialColors;
+  int fNumPaletteTemperatureColors;
+  int *fPaletteTemperatureColors;
 
   void MakePaletteDiverging() {
     const Int_t NRGBs = 5;
@@ -34,6 +65,43 @@ private:
     gStyle->SetNumberContours(NCont);
 
   }
+
+  void MakePaletteTemperature() {
+    int nsteps = 7;
+    fNumPaletteTemperatureColors = 1+nsteps*2;
+    fPaletteTemperatureColors = new Int_t[fNumPaletteTemperatureColors];
+    // First, do the reds
+    int ii = 0;
+    int ic;
+    double rgb[3] = {0.,0.,0.};
+    for(int i = 0; i < nsteps; i++) {
+      if(rgb[2] < 1. ) {
+        rgb[2] += 0.25;
+      } else {
+        rgb[0] += 0.25;
+      }
+      rgb[1] += 0.125;
+      ic = TColor::GetFreeColorIndex();
+      fPaletteTemperatureColors[ii++] = ic;
+      (void)new TColor(ic, rgb[0], rgb[1], rgb[2]);
+    }
+    rgb[0] = rgb[1] = rgb[2] = 1.0;
+    ic = TColor::GetFreeColorIndex();
+    fPaletteTemperatureColors[ii++] = ic;
+    (void)new TColor(ic, rgb[0], rgb[1], rgb[2]);
+    for(int i = 0; i < nsteps; i++) {
+      if(rgb[1] > 0.0 ) {
+        rgb[1] -= 0.25;
+        rgb[2] = rgb[1];
+      } else {
+        rgb[0] -= 0.25;
+      }
+      ic = TColor::GetFreeColorIndex();
+      fPaletteTemperatureColors[ii++] = ic;
+      (void)new TColor(ic, rgb[0], rgb[1], rgb[2]);
+    }
+  };
+
 
   void MakePaletteSequential() {
     fNumPaletteSequentialColors = 9;
