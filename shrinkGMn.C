@@ -139,7 +139,7 @@ void shrinkGMn(const char *fileName, const char *out = "shrunk.root")
   // Enable only the ones we are using
   treeIn->SetBranchStatus("ev",1);
   treeIn->SetBranchStatus("ev_gmn",1);
-  treeIn->SetBranchStatus("gen",1);
+  //treeIn->SetBranchStatus("gen",1);
   treeIn->SetBranchStatus("Earm.BBCal.x",1);
   treeIn->SetBranchStatus("Earm.BBCal.y",1);
   treeIn->SetBranchStatus("Earm.BBCal.z",1);
@@ -150,20 +150,20 @@ void shrinkGMn(const char *fileName, const char *out = "shrunk.root")
   treeIn->SetBranchStatus("Earm.BBCal.pz",1);
   treeIn->SetBranchStatus("Earm.BBCal.mid",1);
   treeIn->SetBranchStatus("Earm.BBCal.pid",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.x",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.y",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.z",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.edep",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.p",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.px",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.py",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.pz",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.mid",1);
-  treeIn->SetBranchStatus("Harm.HCAL_box.pid",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.x",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.y",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.z",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.edep",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.p",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.px",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.py",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.pz",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.mid",1);
+  treeIn->SetBranchStatus("Harm.HCALbox.pid",1);
 
   treeIn->SetBranchAddress("ev",&ev.count);
   treeIn->SetBranchAddress("ev_gmn",&ev_gmn.nsigma);
-  treeIn->SetBranchAddress("gen",&gen.thbb);
+  //treeIn->SetBranchAddress("gen",&gen.thbb);
   treeIn->SetBranchAddress("Earm.BBCal.x",&bbcal_x);
   treeIn->SetBranchAddress("Earm.BBCal.y",&bbcal_y);
   treeIn->SetBranchAddress("Earm.BBCal.z",&bbcal_z);
@@ -174,16 +174,16 @@ void shrinkGMn(const char *fileName, const char *out = "shrunk.root")
   treeIn->SetBranchAddress("Earm.BBCal.pz",&bbcal_pz);
   treeIn->SetBranchAddress("Earm.BBCal.mid",&bbcal_mid);
   treeIn->SetBranchAddress("Earm.BBCal.pid",&bbcal_pid);
-  treeIn->SetBranchAddress("Harm.HCAL_box.x",&hcal_x);
-  treeIn->SetBranchAddress("Harm.HCAL_box.y",&hcal_y);
-  treeIn->SetBranchAddress("Harm.HCAL_box.z",&hcal_z);
-  treeIn->SetBranchAddress("Harm.HCAL_box.edep",&hcal_edep);
-  treeIn->SetBranchAddress("Harm.HCAL_box.p",&hcal_p);
-  treeIn->SetBranchAddress("Harm.HCAL_box.px",&hcal_px);
-  treeIn->SetBranchAddress("Harm.HCAL_box.py",&hcal_py);
-  treeIn->SetBranchAddress("Harm.HCAL_box.pz",&hcal_pz);
-  treeIn->SetBranchAddress("Harm.HCAL_box.mid",&hcal_mid);
-  treeIn->SetBranchAddress("Harm.HCAL_box.pid",&hcal_pid);
+  treeIn->SetBranchAddress("Harm.HCALbox.x",&hcal_x);
+  treeIn->SetBranchAddress("Harm.HCALbox.y",&hcal_y);
+  treeIn->SetBranchAddress("Harm.HCALbox.z",&hcal_z);
+  treeIn->SetBranchAddress("Harm.HCALbox.edep",&hcal_edep);
+  treeIn->SetBranchAddress("Harm.HCALbox.p",&hcal_p);
+  treeIn->SetBranchAddress("Harm.HCALbox.px",&hcal_px);
+  treeIn->SetBranchAddress("Harm.HCALbox.py",&hcal_py);
+  treeIn->SetBranchAddress("Harm.HCALbox.pz",&hcal_pz);
+  treeIn->SetBranchAddress("Harm.HCALbox.mid",&hcal_mid);
+  treeIn->SetBranchAddress("Harm.HCALbox.pid",&hcal_pid);
 
   TFile *fileOut = new TFile(out, "RECREATE");
   fileOut->cd();
@@ -281,6 +281,16 @@ void shrinkGMn(const char *fileName, const char *out = "shrunk.root")
   }
 
   // Save the configuration (Gen) info tree
+  G4SBSRunData *run_data = (G4SBSRunData*)fileIn->Get("run_data");
+  gen.thbb = run_data->fBBtheta;
+  gen.thsbs = run_data->fSBStheta;
+  gen.dbb = run_data->fBBdist;
+  gen.dsbs = run_data->fSBSdist;
+  gen.dhcal = run_data->fHCALdist;
+  gen.voffhcal = run_data->fHCALvoff;
+  gen.drich = run_data->fRICHdist;
+  gen.dsbstrkr = run_data->fSBSTrackerdist;
+  gen.Ebeam = run_data->fBeamE;
   TTree *treeOut2 = new TTree("TGen","G4SBS GMn Acceptance Studies Gen Tree");
   treeOut2->Branch("gen",&gen,"thbb/D:thsbs/D:dbb/D:dsbs/D:dhcal/D:voffhcal/D:drich/D:dsbstrkr/D:Ebeam/D");
   treeIn->GetEntry(0);

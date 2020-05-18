@@ -7,6 +7,8 @@
 #include <TH2F.h>
 #include <TProfile2D.h>
 #include <TGraph.h>
+#include <Fit/Fitter.h>
+#include <Math/Functor.h>
 
 class GMnAcceptance {
 public:
@@ -56,7 +58,7 @@ private:
   TCanvas *fCanvasIdentification;
   TCanvas *fCanvasElectronRates;
 
-
+  std::vector<TCanvas*> fCanvasGeneric;
 
   // Internal functions
   TCanvas* MakeCanvas(const char *name, int cols, int rows, double scale = 1);
@@ -97,6 +99,7 @@ private:
   void DrawAnglesDetected(TCanvas *canvas);
   bool InsideThetaPQ(double ox, double oy, double vx, double vy);
   void SaveAcceptanceMap(TString filename);
+  TCanvas* DrawPositionsGenericH(TH2F *hN, TH2F *hP);
 
 // Histograms:
 private:
@@ -174,6 +177,8 @@ private:
   TH2F *fhEArmCoincidencePositions;
   TH2F *fhHArmZvsMomentum[2];
 
+  std::vector<std::vector<TH2F*> > fhHArmPositionSlices[2];
+
   TProfile2D *fhHAngleVPositionN;
   TProfile2D *fhHAngleVPositionP;
   TProfile2D *fhHAngleHPositionN;
@@ -192,5 +197,131 @@ private:
   std::vector<TH2F*>  fhHAngleBadIdentificationP;
   GMnResults_t fResults;
 };
+
+class MyEdgeFit {
+public:
+  MyEdgeFit() : fN(0), fFCN(0), fFitter(0), fPhMin(0), fPhMax(0) {
+  };
+
+  MyEdgeFit(std::vector<double> x, std::vector<double> y)
+    : fN(0), fFCN(0), fFitter(0), fPhMin(0), fPhMax(0) {
+    SetVecs(x,y);
+  }
+
+  void SetVecs(std::vector<double> x, std::vector<double> y) {
+    if(x.size() == y.size()) {
+      fXs.clear();
+      fYs.clear();
+      fXs = x;
+      fYs = y;
+      fN = fXs.size();
+
+      fFCN = new ROOT::Math::Functor(this,&MyEdgeFit::Chi2,3);
+      fFitter = new ROOT::Fit::Fitter();
+      fPars[0] = 90.;
+      fPars[1] = 0.0;
+      fPars[2] = 45.0;
+      fFitter->SetFCN(*fFCN,fPars);
+      fFitter->Config().ParSettings(0).SetName("X");
+      fFitter->Config().ParSettings(1).SetName("Y");
+      fFitter->Config().ParSettings(2).SetName("R");
+    }
+  }
+
+  bool Fit() {
+    bool ok = fFitter->FitFCN();
+    if(!ok) {
+      Error("Boo!","Fit failed :(");
+    } else {
+      const ROOT::Fit::FitResult &result = fFitter->Result();
+      result.Print(std::cout);
+      for(int i = 0; i < 3; i++) {
+        fPars[i] = result.Parameter(i);
+      }
+    }
+    return ok;
+  }
+
+  /*
+  void DrawFit(const char *opt = "") {
+    if(fArc)
+      delete fArc;
+    fArc = new TArc(fPars[0],fPars[1],fPars[2]);
+    for(int i = 0; i < 3; i++) {
+      std::cout << "p[" << i << "] = " << fPars[i] << std::endl;
+    }
+    fArc->SetLineColor(kRed);
+    fArc->SetLineWidth(4);
+    fArc->SetFillStyle(0);
+    fArc->Draw(opt);
+    gPad->Update();
+  }*/
+
+  double EvalRadius( double x, double y) {
+    return TMath::Sqrt(
+        TMath::Power(x-fPars[0],2) +
+        TMath::Power(y-fPars[1],2) );
+  }
+
+  double Radius() { return fPars[2]; }
+
+  double Chi2(const double *par) {
+    if(fN <= 0) {
+      return -1;
+    }
+    Double_t f = 0;
+    for (Int_t i=0;i<fN;i++) {
+      Double_t u = fXs[i] - par[0];
+      Double_t v = fYs[i] - par[1];
+      Double_t dr = par[2] - std::sqrt(u*u+v*v);
+      f += dr*dr;
+    }
+    return f;
+  }
+
+private:
+  std::vector<double> fXs;
+  std::vector<double> fYs;
+  int fN;
+  ROOT::Math::Functor *fFCN;
+  ROOT::Fit::Fitter *fFitter;
+  double fPars[3];
+  //TArc *fArc;
+  double fPhMin;
+  double fPhMax;
+};
+
+void excludeOutliers(std::vector<double> &v0, std::vector<double> &v1, bool doSecondPass = true)
+{
+  int n = v0.size();
+  if(n  <= 3 )
+    return;
+  double mean = 0;
+  double sigma = 0;
+  std::vector<double> t0 = v0;
+  std::vector<double> t1 = v1;
+  v0.clear();
+  v1.clear();
+  for(int i = 0; i < n; i++) {
+    mean += t0[i];
+  }
+  mean /= double(n);
+  for(int i = 0; i < n; i++) {
+    sigma += TMath::Power((t0[i]-mean),2);
+  }
+  sigma = TMath::Sqrt(sigma/(n-1));
+
+  // Now find the outliers
+  for(int i = 0; i < n; i++) {
+    if(TMath::Abs(t0[i]-mean)<3.5*sigma) {
+      v0.push_back(t0[i]);
+      v1.push_back(t1[i]);
+    }
+  }
+
+  if(doSecondPass) {
+    excludeOutliers(v0,v1,false);
+  }
+}
 
 #endif // GMNACCEPTANCE_H

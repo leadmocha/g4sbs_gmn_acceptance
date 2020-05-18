@@ -29,8 +29,12 @@
 
 ## Limit steps by making calorimeters and magnets total absorbers
 ## We can do this here only because we are looking at acceptances only
-/g4sbs/steplimit    lHCalo true
+/g4sbs/steplimit    log_HCAL true
 /g4sbs/steplimit    bbcal_mother_log true
 /g4sbs/totalabs     true
 /g4sbs/keepcalparticles Earm/BBCal true
 /g4sbs/keepcalparticles Harm/HCAL_box true
+/g4sbs/keepcalparticles Harm/HCALbox true
+/g4sbs/threshold Earm.BBCal 0.0 GeV
+/g4sbs/threshold Harm.HCAL_box 0.0 GeV
+/g4sbs/treeflag 0 ## Force it to record *all* events!

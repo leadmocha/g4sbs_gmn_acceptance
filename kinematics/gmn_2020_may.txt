@@ -1,0 +1,20 @@
+##  Kinematics & settings for GMn experiment
+##  These are my starting values for October 2016 settings. I based them off
+##  some starting values from July with a few exceptions as detailed below.
+##  Q^2   E_beam  theta_bb  theta_sbs   dist_bb   dist_mag  dist_hcal   Bdl     gen? gold?
+1   3.5     4.4   32.5      31.1        1.55      2.00      7.2         1.56    yes  no
+2   4.5     4.4   41.9      24.7        1.55      2.25      7.5         1.71    yes  no
+3   5.7     6.6   30.3      24.7        1.55      2.25      7.5         1.71    yes  no
+4   8.1     6.6   43.0      17.5        1.55      2.25      11.0        1.29    yes  no
+5   10.2    8.8   34.0      17.5        1.75      2.25      11.0        1.37    yes  no
+6   12.0    8.8   44.2      13.3        1.55      2.25      14.0        1.26    yes  no
+7   13.5   11.0   33.0      14.8        1.55      3.1       17.0        0.94    yes  no
+## Note: Max according to Robin is 1.71 T-m or 1.0528 T for GMn setting
+## So Kin #2 is set to the max already
+## Started with Kin#3 at 1.45 Tm because I had previously found it to produce
+## the highest integrated cross section and lowest mis-identification on
+## special studies done with uniform magnetic field.
+## Kin #5 dist_bb changed from 2.10 to 1.75 m because Alan said there was
+## enough room.
+## 10/06/2016: Simulations will now have the front clamp on and use a
+## TOSCA map from Bogdan.

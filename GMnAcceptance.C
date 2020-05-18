@@ -4,6 +4,7 @@
 #include <TMath.h>
 #include <TBox.h>
 #include <TPaveStats.h>
+#include <TF1.h>
 
 #include <iostream>
 
@@ -140,7 +141,9 @@ double kMinPhi[8]           = {0,  -25,  -25,  -25,  -25,  -25,  -25,  -25 };
 double kMaxPhi[8]           = {0,   25,   25,   25,   25,   25,   25,   25 };
 //double kMinTheta[8]         = {0,   20,   32,   51,   35,   21,   31,   22 };
 //double kMaxTheta[8]         = {0,   47,   55,   78,   62,   48,   58,   49 };
-double kMinTheta[8]         = {25, 25, 25, 25, 25, 25, 25, 25};
+//double kMinTheta[8]         = {25, 25, 25, 25, 25, 25, 25, 25};
+// 2020-05-14 Change limits to -20 degrees
+double kMinTheta[8]         = {20, 20, 20, 20, 20, 20, 20, 20};
 double kMaxTheta[8]         = {75, 75, 75, 75, 75, 75, 75, 75};
 double kMinPlotPElectron[8] = {0,    0,    0,  0.5,    0,    1,    0,  1.5 };
 double kMaxPlotPElectron[8] = {4,    4,    4,  2.0,    4,    5,    4,  6.0 };
@@ -160,6 +163,17 @@ double kMaxHCalX  =  kPlotPositionPadding*kHCalHeight/2.;
 double kMinHCalY  = -kPlotPositionPadding*kHCalHeight/2.;
 double kMaxHCalY  =  kPlotPositionPadding*kHCalHeight/2.;
 
+
+const bool kSlicesInAcceptance = false+1;
+const int kNPhiSlice = 5;
+const double kDPhiSlice = 1.0;
+double gPhiSlices[kNPhiSlice];
+const double kMinPhiSlice = -10;
+const double kMaxPhiSlice = +10;
+
+const int kNThetaSlice = 5;
+double kDThetaSlice = 1.0;
+double gThetaSlices[kNThetaSlice];
 
 
 GMnAcceptance::GMnAcceptance(int kin, double voff, TString resultsPath) :
@@ -193,6 +207,19 @@ void GMnAcceptance::Init()
     steps++;
   }
 
+  // Specify slices in phase space for diagnostic histograms
+  // Get generated theta
+  double minth = fGenData.thbb*180./TMath::Pi()-5;
+  double maxth = fGenData.thbb*180./TMath::Pi()+5;
+  double dth = (maxth-minth)/double(kNThetaSlice);
+  double dph = (kMaxPhiSlice-kMinPhiSlice)/double(kNPhiSlice);
+  for( int it = 0; it < kNThetaSlice; it++) {
+    gThetaSlices[it] = minth+dph*it;
+  }
+  for(int ip = 0; ip < kNPhiSlice; ip++) {
+    gPhiSlices[ip] = kMinPhiSlice+dph*ip;
+  }
+
   for(int i = 0; i < 3; i++) {
     // HArm Angular Acceptance
     fhHArmAngles[i] = MakeAnglesHisto(TString::Format(
@@ -223,6 +250,14 @@ void GMnAcceptance::Init()
         "fhHArmPositionsInAcceptanceWeighted",i);
     fhHArmCoincidencePositions[i] = MakeHCalPositionHisto("in Coincidence",
         "fhHArmCoincidencePositions",i);
+
+    fhHArmPositionSlices[i].resize(kNThetaSlice);
+    for( int it = 0; it < kNThetaSlice; it++) {
+      for(int ip = 0; ip < kNPhiSlice; ip++) {
+        fhHArmPositionSlices[i][it].push_back( MakeHCalPositionHisto("",
+            Form("hHArmPositionsPhiSlices_Th%d_Ph%d",it,ip),i) );
+      }
+    }
   }
   gStyle->SetOptStat(1110);
 
@@ -451,8 +486,8 @@ void GMnAcceptance::ProcessData(GMnData_t data)
 {
   fData = data;
   // Fix vertical offset on neutron and proton
-  fData.pvars.y -= fVOff/100.; // because data is is m
-  fData.nvars.y -= fVOff/100.; // because data is is m
+  //fData.pvars.y -= fVOff/100.; // because data is is m
+  //fData.nvars.y -= fVOff/100.; // because data is is m
 
   // For hadrons, throw away any hadrons that hit on the outer module
   // (because it's possible that their shower is not entirely contained
@@ -487,6 +522,19 @@ void GMnAcceptance::ProcessFirstPassEntry(int entry, GMnStatus_t status,
       fhHArmPositionsWithTrig[0]->Fill(fData.nvars.x,fData.nvars.y,FILL_NORM);
       fhHArmPositionsWeightedWithTrig[0]->Fill(fData.nvars.x,fData.nvars.y,fData.ev.nsigma*SIGMA_UNIT);
     }
+    if(!kSlicesInAcceptance) {
+      for( int it = 0; it < kNThetaSlice; it++) {
+        if(TMath::Abs(fData.ev.theta-gThetaSlices[it]) < kDThetaSlice) {
+          for(int ip = 0; ip < kNPhiSlice; ip++) {
+            if(TMath::Abs(fData.ev.phi-gPhiSlices[ip]) < kDPhiSlice) {
+              fhHArmPositionSlices[0][it][ip]->Fill(
+                  fData.nvars.x,fData.nvars.y,FILL_NORM);
+            }
+          }
+        }
+      }
+    }
+
   }
   if(fData.p_det) {
     fhHArmPositions[1]->Fill(fData.pvars.x,fData.pvars.y,FILL_NORM);
@@ -496,6 +544,19 @@ void GMnAcceptance::ProcessFirstPassEntry(int entry, GMnStatus_t status,
       fhHArmPositionsWithTrig[1]->Fill(fData.pvars.x,fData.pvars.y,FILL_NORM);
       fhHArmPositionsWeightedWithTrig[1]->Fill(fData.pvars.x,fData.pvars.y,fData.ev.psigma*SIGMA_UNIT);
     }
+    if(!kSlicesInAcceptance) {
+      for( int it = 0; it < kNThetaSlice; it++) {
+        if(TMath::Abs(fData.ev.theta-gThetaSlices[it]) < kDThetaSlice) {
+          for(int ip = 0; ip < kNPhiSlice; ip++) {
+            if(TMath::Abs(fData.ev.phi-gPhiSlices[ip]) < kDPhiSlice) {
+              fhHArmPositionSlices[1][it][ip]->Fill(
+                  fData.pvars.x,fData.pvars.y,FILL_NORM);
+            }
+          }
+        }
+      }
+    }
+
   }
 
   if(fData.e_det&&fData.n_det&&fData.p_det) {
@@ -609,6 +670,18 @@ void GMnAcceptance::ProcessSecondPassEntry(int entry, GMnStatus_t status,
         fData.nvars.y,fData.ev.nsigma*SIGMA_UNIT);
     fhHAngleDetectedN->Fill(fData.ev.theta,fData.ev.phi);
     IdentifyAndFill(0,b,fhHAngleBadIdentificationN,fhHAngleGoodIdentificationN);
+    if(kSlicesInAcceptance) {
+      for( int it = 0; it < kNThetaSlice; it++) {
+        if(TMath::Abs(fData.ev.theta-gThetaSlices[it]) < kDThetaSlice) {
+          for(int ip = 0; ip < kNPhiSlice; ip++) {
+            if(TMath::Abs(fData.ev.phi-gPhiSlices[ip]) < kDPhiSlice) {
+              fhHArmPositionSlices[0][it][ip]->Fill(
+                  fData.nvars.x,fData.nvars.y,FILL_NORM);
+            }
+          }
+        }
+      }
+    }
   }
   if(fData.p_det) {
     fAcceptedProtons++;
@@ -616,7 +689,20 @@ void GMnAcceptance::ProcessSecondPassEntry(int entry, GMnStatus_t status,
     fhHArmPositionsInAcceptanceWeighted[1]->Fill(fData.pvars.x,
         fData.pvars.y,fData.ev.psigma*SIGMA_UNIT);
     fhHAngleDetectedP->Fill(fData.ev.theta,fData.ev.phi);
-    IdentifyAndFill(0,b,fhHAngleBadIdentificationP,fhHAngleGoodIdentificationP);
+    IdentifyAndFill(1,b,fhHAngleBadIdentificationP,fhHAngleGoodIdentificationP);
+    if(kSlicesInAcceptance) {
+      for( int it = 0; it < kNThetaSlice; it++) {
+        if(TMath::Abs(fData.ev.theta-gThetaSlices[it]) < kDThetaSlice) {
+          for(int ip = 0; ip < kNPhiSlice; ip++) {
+            if(TMath::Abs(fData.ev.phi-gPhiSlices[ip]) < kDPhiSlice) {
+              fhHArmPositionSlices[1][it][ip]->Fill(
+                  fData.pvars.x,fData.pvars.y,FILL_NORM);
+            }
+          }
+        }
+      }
+    }
+
   }
 }
 
@@ -831,8 +917,8 @@ GMnResultsSigmaSol_t GMnAcceptance::ComputeAcceptance(TH2F *nEff, TH2F *pEff)
         //result.sigmaPE += TMath::Power(fhAnglesSigmaP->GetBinError(b),2)*dOmega;
 
         // Add this bin to the solid angle computation with efficiency
-        result.solidN += dOmega*sinTheta*ne;
-        result.solidP += dOmega*sinTheta*pe;
+        result.solidN += dOmega*sinTheta;//*ne;
+        result.solidP += dOmega*sinTheta;//*pe;
       }
     }
   }
@@ -878,6 +964,112 @@ void GMnAcceptance::CleanAcceptanceMap()
         fhAnglesMap->SetBinContent(b,1.0);
       }
     }
+  }
+
+  if(false) {
+    // Now detect the edges and make a better map
+    double minx = 1e6;
+    double maxx = -1e6;
+    double miny = 1e6;
+    double maxy = -1e6;
+    TAxis *xa = fhAnglesMap->GetXaxis();
+    TAxis *ya = fhAnglesMap->GetYaxis();
+    std::vector<double> topX,topY;
+    std::vector<double> leftX,leftY;
+    std::vector<double> botX,botY;
+    std::vector<double> rightX,rightY;
+    for(int bx = 1; bx <= nbx; bx++) {
+      miny = 1e9;
+      maxy = -1e9;
+      for(int by = 1; by <= nby; by++) {
+        if(fhAnglesMap->GetBinContent(bx,by)) {
+          if(ya->GetBinLowEdge(by) < miny) {
+            miny = ya->GetBinLowEdge(by);
+          }
+          if(ya->GetBinLowEdge(by) + ya->GetBinWidth(by) > maxy) {
+            maxy = ya->GetBinLowEdge(by) + ya->GetBinWidth(by);
+          }
+        }
+      }
+      if(maxy != -1e9) {
+        topX.push_back(xa->GetBinCenter(bx));
+        topY.push_back(maxy);
+      }
+      if(miny != 1e9) {
+        botX.push_back(xa->GetBinCenter(bx));
+        botY.push_back(miny);
+      }
+    }
+
+    for(int by = 1; by <= nby; by++) {
+      minx = 1e9;
+      maxx = -1e9;
+      for(int bx = 1; bx <= nbx; bx++) {
+        if(fhAnglesMap->GetBinContent(bx,by)) {
+          if(xa->GetBinLowEdge(bx) < minx) {
+            minx = xa->GetBinLowEdge(bx);
+          }
+          if(xa->GetBinLowEdge(bx) + xa->GetBinWidth(bx) > maxx) {
+            maxx = xa->GetBinLowEdge(bx) + xa->GetBinWidth(bx);
+          }
+        }
+      }
+      if(maxx != -1e9) {
+        rightX.push_back(maxx);
+        rightY.push_back(ya->GetBinCenter(by));
+      }
+      if(minx != 1e9) {
+        leftX.push_back(minx);
+        leftY.push_back(ya->GetBinCenter(by));
+      }
+    }
+
+    excludeOutliers(topY,topX);
+    excludeOutliers(botY,botX);
+    excludeOutliers(leftX,leftY);
+    excludeOutliers(rightX,rightY);
+
+    TGraph *topG = new TGraph(topX.size(),topX.data(),topY.data());
+    topG->SetLineColor(kGreen+1);
+    topG->SetLineWidth(2);
+    topG->Draw("LSAME");
+    topG->Fit("pol2");
+    TF1 *topF = topG->GetFunction("pol2");
+
+    TGraph *botG = new TGraph(botX.size(),botX.data(),botY.data());
+    botG->SetLineColor(kGreen+1);
+    botG->SetLineWidth(2);
+    botG->Fit("pol2");
+    TF1 *botF = botG->GetFunction("pol2");
+
+    TGraph *leftG = new TGraph(leftX.size(),leftX.data(),leftY.data());
+    leftG->SetLineColor(kGreen+1);
+    leftG->SetLineWidth(2);
+
+    TGraph *rightG = new TGraph(rightX.size(),rightX.data(),rightY.data());
+    rightG->SetLineColor(kGreen+1);
+    rightG->SetLineWidth(2);
+
+    MyEdgeFit leftF(leftX,leftY);
+    MyEdgeFit rightF(rightX,rightY);
+
+    double xx,yy;
+    if(leftF.Fit() && rightF.Fit() ) {
+      for(int bx = 1; bx <= nbx; bx++) {
+        for(int by = 1; by <= nby; by++) {
+          xx = xa->GetBinCenter(bx);
+          yy = ya->GetBinCenter(by);
+          if( leftF.Radius() >= leftF.EvalRadius(xx,yy) && 
+              rightF.Radius() <= rightF.EvalRadius(xx,yy) && 
+              yy <= topF->Eval(xx) && yy >= botF->Eval(xx) ) {
+            fhAnglesMap->SetBinContent(bx,by,1.0);
+          } else {
+            fhAnglesMap->SetBinContent(bx,by,0);
+          }
+        }
+      }
+    }
+
   }
   delete map;
 }
@@ -1083,6 +1275,15 @@ void GMnAcceptance::FinalizeSecondPass()
   SaveCanvas(fCanvasPositionsInAcceptance,"positions_in_acceptance");
   DrawPositionsInAcceptanceWeighted(fCanvasPositionsInAcceptanceWeighted);
   SaveCanvas(fCanvasPositionsInAcceptanceWeighted,"positions_weighted_in_acceptance");
+  for( int it = 0; it < kNThetaSlice; it++) {
+    for(int ip = 0; ip < kNPhiSlice; ip++) {
+      TCanvas *ctmp = DrawPositionsGenericH(fhHArmPositionSlices[0][it][ip],
+          fhHArmPositionSlices[1][it][ip]);
+      SaveCanvas(ctmp,Form("positions_theta_slice_%g_phi_slice_%g",
+            gThetaSlices[it],gPhiSlices[ip]),"png",true);
+    }
+  }
+
   gGMnColors->SelectPaletteDiverging();
 
 
@@ -1194,6 +1395,7 @@ void GMnAcceptance::SaveCanvas(TCanvas *canvas, const char *comment,
 
   // Get the path
   TString path = GetSavePath(inSubdir);
+  gSystem->mkdir(path,true);
 
   canvas->SaveAs(Form("%s/gmn_kin%02d_v%g_%s.%s",
         path.Data(),fKin,fVOff,comment,ext));
@@ -1244,6 +1446,21 @@ void GMnAcceptance::DrawPositionsInAcceptanceWeighted(TCanvas *canvas)
   DrawHCalBox();
 }
 
+TCanvas* GMnAcceptance::DrawPositionsGenericH(TH2F *hN, TH2F *hP)
+{
+  TCanvas *canvas = MakeCanvas(Form("fCanvasGeneric%zu",fCanvasGeneric.size()),2,1);
+  fCanvasGeneric.push_back(canvas);
+  canvas->cd(1);
+  gPad->SetGrid(kTRUE,kTRUE);
+  hN->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+  canvas->cd(2);
+  gPad->SetGrid(kTRUE,kTRUE);
+  hP->Draw(kHist2DDrawOption);
+  DrawHCalBox();
+
+  return canvas;
+}
 
 void GMnAcceptance::DrawPositionsWeighted(TCanvas *canvas)
 {

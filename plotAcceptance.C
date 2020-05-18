@@ -40,10 +40,10 @@ void PlotAcceptance::InitChain()
   fChain = new TChain("T");
   fChainGen = new TChain("TGen");
   std::cout << "Found "
-    << fChain->Add(Form("rootfiles/%s/kin%02d/gmn_kin%02d_r*.root",
-          fDate.Data(),fKin,fKin));
-  fChainGen->Add(Form("rootfiles/%s/kin%02d/gmn_kin%02d_r*.root",
-          fDate.Data(),fKin,fKin));
+    << fChain->Add(Form("%s/%s/kin%02d/gmn_kin%02d_r*.root",
+          getenv("GMnRootfiles"),fDate.Data(),fKin,fKin));
+  fChainGen->Add(Form("%s/%s/kin%02d/gmn_kin%02d_r*.root",
+          getenv("GMnRootfiles"),fDate.Data(),fKin,fKin));
   fChainEntries = fChain->GetEntries();
   if(kQuickPlot)
     fChainEntries *= kQuickPlotPercent;
