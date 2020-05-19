@@ -30,5 +30,3 @@ if [ $kinlist == -1 ]; then
   echo "Will iterate over all kins"
   kinlist="1234567"
 fi
-
-
